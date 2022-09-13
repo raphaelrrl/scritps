@@ -1,0 +1,73 @@
+#!/bin/bash
+#Autor: Raphael Rodrigues
+
+# Upgrade do SO
+apt update
+apt upgrade
+cd /tmp
+rm *deb*
+rm /tmp/finish
+
+# Instalacao dependencias bibliotecas essenciais
+apt install -y wget build-essential
+apt install -y apache2 apache2-utils
+apt install -y libapache2-mod-php php php-mysql php-cli php-pear php-gmp php-gd
+apt install -y php-bcmath  php-curl php-xml php-zip
+apt install -y mariadb-server mariadb-client
+apt install -y snmpd snmp snmptrapd libsnmp-base libsnmp-dev
+apt install -y screen figlet toilet cowsay
+useradd zabbix
+
+##bem, chegou a hora de baixar o nosso zabbix.
+cd /tmp
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-3+debian11_all.deb
+dpkg -i zabbix-release_6.0-3+debian11_all.deb
+sleep 3
+apt update ; apt upgrade
+apt install -y zabbix-server-mysql zabbix-sql-scripts  zabbix-frontend-php zabbix-apache-conf zabbix-agent
+
+##agora que o nosso banco de dados esta instalado vamos criar a base que ira receber os dados do zabbix.
+export DEBIAN_FRONTEND=noninteractive
+mariadb -uroot -e "create database zabbix character set utf8mb4 collate utf8mb4_bin";
+mariadb -uroot -e "create user 'zabbix'@'localhost' identified by 'p455w0rd'";
+mariadb -uroot -e "grant all privileges on zabbix.* to 'zabbix'@'localhost'";
+zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -pp455w0rd zabbix
+echo 'Populando base de dados zabbix, pode demorar um pouco dependendo do hardware'
+sleep 10
+sed -i 's/# DBPassword=/DBPassword=p455w0rd/' /etc/zabbix/zabbix_server.conf
+
+##timezone php, execute o commando abaixo, em seguida edite que arquivo de configuração etc/zabbix/apache.conf como descrito abaixo:
+timedatectl set-timezone America/Sao_Paulo
+sed -i 's/# php_value date.timezone Europe\/Riga/php_value date.timezone America\/Sao_Paulo/g' /etc/apache2/conf-enabled/zabbix.conf
+systemctl enable zabbix-server zabbix-agent
+systemctl restart zabbix-server zabbix-agent apache2
+systemctl status zabbix-server
+
+# Grafana Install oficial repo
+apt-get install -y apt-transport-https
+apt-get install -y software-properties-common
+wget -q -O - https://packages.grafana.com/gpg.key | apt-key add -
+sleep 10
+echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list
+apt-get update
+apt-get install -y grafana
+
+#Instalando Datasource Zabbix
+grafana-cli plugins install alexanderzobnin-zabbix-app
+grafana-cli plugins update alexanderzobnin-zabbix-app
+systemctl daemon-reload
+systemctl start grafana-server
+systemctl enable grafana-server
+touch /tmp/finish
+
+#O pulo do gato para o perfeito monitoramento, ajustes SNMP
+wget http://ftp.de.debian.org/debian/pool/non-free/s/snmp-mibs-downloader/snmp-mibs-downloader_1.5_all.deb
+Sleep 20
+dpkg -i snmp-mibs-downloader_1.5_all.deb
+sleep 20
+apt-get -y install smistrip
+
+clear
+figlet -c senha BD p455w0rd
+figlet -c FINALIZADO!
+systemctl status zabbix-server | grep Active
