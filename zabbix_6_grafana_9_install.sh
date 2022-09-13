@@ -1,5 +1,6 @@
 #!/bin/bash
 #Autor: Raphael Rodrigues
+#Homologado para Debian 11 LTS
 
 # Upgrade do SO
 apt update
