@@ -1,6 +1,8 @@
 #!/bin/bash
 #Autor: Raphael Rodrigues
 #Homologado para Debian 11 LTS
+#Baixe o script, execute o comando chmod +x zabbix_6_grafana_9_install.sh para permissão de execução.
+#Em seguida execute o comando ./zabbix_6_grafana_9_install.sh
 
 # Upgrade do SO
 apt update
