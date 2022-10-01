@@ -1,0 +1,35 @@
+##agora que atualizamos o repositório do servidor esta na hora de atualizar sistema.
+apt update
+apt upgrade
+ 
+nano /etc/hostname
+echo  zabbix-server > /proc/sys/kernel/hostname
+
+# dependencias
+apt install -y wget build-essential
+apt install -y snmpd snmp snmptrapd libsnmp-base libsnmp-dev
+
+##bem, chegou a hora de baixar o nosso zabbix.
+
+cd /tmp
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bdebian11_all.deb
+dpkg -i zabbix-release_6.0-4+debian11_all.deb
+apt update
+apt upgrade
+apt install -y zabbix-server-mysql zabbix-sql-scripts  zabbix-frontend-php zabbix-apache-conf zabbix-agent
+
+##edite o arquivo zabbix_server.conf na camada server para informar os dados para conexão com o banco.
+
+nano /etc/zabbix/zabbix_server.conf
+
+ DBHost=IP DO BANCO DE DADOS
+ DBpassword=p455w0rd
+ DBUser=zabbix_bd
+
+##ativar os serviços do Zabbix e realizar o primeiro acesso.
+
+systemctl enable zabbix-server zabbix-agent
+systemctl restart zabbix-server zabbix-agent
+systemctl status zabbix-server
+
+http://seu_ip_zabbixserver/zabbix

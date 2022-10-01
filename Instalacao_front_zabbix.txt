@@ -1,0 +1,67 @@
+##agora que atualizamos o repositório do servidor esta na hora de atualizar sistema.
+
+nano /etc/hostname
+echo  zabbix-front > /proc/sys/kernel/hostname
+apt update
+apt upgrade
+useradd zabbix
+
+apt install -y wget build-essential
+apt install -y apache2 apache2-utils
+apt install -y libapache2-mod-php php php-mysql php-cli php-pear php-gmp php-gd 
+apt install -y php-bcmath  php-curl php-xml php-zip
+apt install -y snmpd snmp snmptrapd libsnmp-base libsnmp-dev
+
+##bem, chegou a hora de baixar o nosso zabbix.
+
+cd /tmp
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-3%2Bdebian11_all.deb
+dpkg -i zabbix-release_6.0-3+debian11_all.deb
+apt update
+apt upgrade
+apt install -y  zabbix-frontend-php zabbix-apache-conf zabbix-agent
+
+##timezone php, execute o commando abaixo, em seguida edite que arquivo de configuração etc/zabbix/apache.conf como descrito abaixo:
+
+timedatectl set-timezone America/Sao_Paulo
+
+nano /etc/zabbix/apache.conf
+<ifmodule mod_php7.c>
+        php_value max_execution_time 300
+        php_value memory_limit 512m
+        php_value post_max_size 48m
+        php_value upload_max_filesize 24m
+        php_value max_input_time 300
+        php_value max_input_vars 10000
+        php_value always_populate_raw_post_data -1
+        php_value date.timezone America/Sao_Paulo
+</ifmodule>
+
+##um pouco de segurança APACHE2
+
+nano /etc/apache2/sites-enabled/000-default.conf
+	<directory /var/www/html/>
+    		options followsymlinks
+    		allowoverride all
+	</directory>
+a2enmod rewrite
+sed -i 's/servertokens os/servertokens prod/' /etc/apache2/conf-available/security.conf
+sed -i 's/serversignature on/serversignature off/' /etc/apache2/conf-available/security.conf
+
+##ativar os serviços do Zabbix e realizar o primeiro acesso.
+
+systemctl enable zabbix-agent apache2
+systemctl restart zabbix-agent apache2
+systemctl status zabbix-agent apache2
+
+http://seu_ip_zabbixserver/zabbix
+
+APOS WIZARD ALTERAR ABAIXO:
+
+#Alterar configurações de acesso no Frontend, retirar os comentários ( // ) 
+ e adicionar os endereços IP do server
+
+nano /etc/zabbix/web/zabbix.conf
+
+$ZBX_SERVER                  = 'IPDOZABBIXSERVER
+$ZBX_SERVER_PORT             = '10051';

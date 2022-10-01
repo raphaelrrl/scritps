@@ -1,0 +1,55 @@
+Instalação BD
+#Atualização
+apt update
+apt upgrade
+useradd zabbix
+nano /etc/hostname
+echo  zabbix-bd > /proc/sys/kernel/hostname
+
+# dependencias
+apt install -y wget build-essential
+apt install -y mariadb-server mariadb-client 
+
+#segurança
+mysql_secure_installation
+change the root password? [y/n] n (não)
+remove anonymous users? [y/n] y (sim)
+disallow root login remotely? [y/n] y (sim)
+remove test database and access to it? [y/n] y (sim)
+reload privilege tables now? [y/n] y (sim)
+
+##agora que o nosso banco de dados esta instalado e seguro vamos criar o banco que vai receber os dados do zabbix.
+
+mariadb -uroot -pp455w0rd
+create database zabbix character set utf8mb4 collate utf8mb4_bin;
+create user 'zabbix_bd'@'%' identified by 'p455w0rd';
+grant all privileges on zabbix.* to 'zabbix_bd'@'%';
+quit;
+
+##bem, chegou a hora de baixar o nosso zabbix.
+
+cd /tmp
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bdebian11_all.deb
+dpkg -i zabbix-release_6.0-4+debian11_all.deb
+apt update
+apt upgrade
+apt install -y zabbix-server-mysql zabbix-sql-scripts  zabbix-agent
+
+##importando base de dados do zabbix
+
+zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz  | mysql -uroot -pp455w0rd zabbix
+
+## Liberar conexão no bando de dados
+
+nano /etc/mysql/mariadb.conf.d/50-server.cnf
+
+
+bind-address            = 0.0.0.0
+
+##ativar os serviços do Zabbix e realizar o primeiro acesso.
+
+systemctl enable enable mariadb@.service zabbix-agent
+/etc/init.d/apache2 start
+/etc/init.d/zabbix-agent  start
+/etc/init.d/mariadb status
+/etc/init.d/zabbix-agent  status
