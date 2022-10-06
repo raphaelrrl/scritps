@@ -26,7 +26,7 @@ cd /tmp
 wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-3+debian11_all.deb
 dpkg -i zabbix-release_6.0-3+debian11_all.deb
 sleep 3
-apt update ; apt upgrade
+apt update -y ; apt upgrade -y
 apt install -y zabbix-server-mysql zabbix-sql-scripts  zabbix-frontend-php zabbix-apache-conf zabbix-agent
 
 ##agora que o nosso banco de dados esta instalado vamos criar a base que ira receber os dados do zabbix.
@@ -34,7 +34,7 @@ export DEBIAN_FRONTEND=noninteractive
 mariadb -uroot -e "create database zabbix character set utf8mb4 collate utf8mb4_bin";
 mariadb -uroot -e "create user 'zabbix'@'localhost' identified by 'p455w0rd'";
 mariadb -uroot -e "grant all privileges on zabbix.* to 'zabbix'@'localhost'";
-zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -pp455w0rd zabbix
+zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -pp455w0rd zabbix
 echo 'Populando base de dados zabbix, pode demorar um pouco dependendo do hardware'
 sleep 10
 sed -i 's/# DBPassword=/DBPassword=p455w0rd/' /etc/zabbix/zabbix_server.conf
