@@ -61,7 +61,7 @@ APOS WIZARD ALTERAR ABAIXO:
 #Alterar configurações de acesso no Frontend, retirar os comentários ( // ) 
  e adicionar os endereços IP do server
 
-nano /etc/zabbix/web/zabbix.conf
+nano /etc/zabbix/web/zabbix.conf.php
 
 $ZBX_SERVER                  = 'IPDOZABBIXSERVER
 $ZBX_SERVER_PORT             = '10051';
