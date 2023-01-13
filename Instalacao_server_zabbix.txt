@@ -24,7 +24,7 @@ nano /etc/zabbix/zabbix_server.conf
 
  DBHost=IP DO BANCO DE DADOS
  DBpassword=p455w0rd
- DBUser=zabbix_bd
+ DBUser=zabbix
 
 ##ativar os serviços do Zabbix e realizar o primeiro acesso.
 
