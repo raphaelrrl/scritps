@@ -22,8 +22,9 @@ reload privilege tables now? [y/n] y (sim)
 
 mariadb -uroot -pp455w0rd
 create database zabbix character set utf8mb4 collate utf8mb4_bin;
-create user 'zabbix_bd'@'%' identified by 'p455w0rd';
-grant all privileges on zabbix.* to 'zabbix_bd'@'%';
+create user 'zabbix'@'%' identified by 'p455w0rd';
+grant all privileges on zabbix.* to 'zabbix'@'%';
+set global log_bin_trust_function_creators = 1;
 quit;
 
 ##bem, chegou a hora de baixar o nosso zabbix.
@@ -37,7 +38,7 @@ apt install -y zabbix-server-mysql zabbix-sql-scripts  zabbix-agent
 
 ##importando base de dados do zabbix
 
-zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz  | mysql -uroot -pp455w0rd zabbix
+zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uroot -pp455w0rd zabbix
 
 ## Liberar conexão no bando de dados
 
@@ -48,8 +49,6 @@ bind-address            = 0.0.0.0
 
 ##ativar os serviços do Zabbix e realizar o primeiro acesso.
 
-systemctl enable enable mariadb@.service zabbix-agent
-/etc/init.d/apache2 start
-/etc/init.d/zabbix-agent  start
+systemctl enable enable mariadb@.service
+/etc/init.d/mariadb start
 /etc/init.d/mariadb status
-/etc/init.d/zabbix-agent  status
