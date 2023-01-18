@@ -79,7 +79,7 @@ output.elasticsearch:
 # Listar modulos do beats e habilitar
 filebeat modules list
 filebeat modules enable netflow
-filebeat setup
+
 
 # acessar arquivo de configuração netflow alterar endereço ip de escuta.
  nano /etc/filebeat/modules.d/netflow.yml
@@ -96,6 +96,7 @@ filebeat setup
         - private
 
 # restart serviços
+ filebeat setup
  systemctl enable filebeat
  service filebeat start
  systemctl restart elasticsearch.service
