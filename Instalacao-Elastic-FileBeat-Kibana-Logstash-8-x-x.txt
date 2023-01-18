@@ -85,7 +85,7 @@ filebeat setup
  nano /etc/filebeat/modules.d/netflow.yml
  - module: netflow
   log:
-    enabled: enabled
+    enabled: true
     var:
       netflow_host: 10.255.255.244
       netflow_port: 2055
