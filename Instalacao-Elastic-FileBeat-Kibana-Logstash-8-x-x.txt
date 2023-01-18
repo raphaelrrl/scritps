@@ -1,5 +1,7 @@
 #!/bin/sh
-# instale as bibliotecas 
+# instale as bibliotecas
+apt update 
+apt upgrade
 apt -y install wget ntp apt-transport-https gnupg unzip curl net-tools default-jre tcpdump
 
 #Instalando elastic search
