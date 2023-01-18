@@ -25,6 +25,7 @@ systemctl daemon-reload
 systemctl restart elasticsearch.service
 systemctl enable elasticsearch.service
 
+# Instalação Kibana
  wget --no-check-certificate https://artifacts.elastic.co/downloads/kibana/kibana-8.6.0-amd64.deb
   dpkg -i kibana-8.6.0-amd64.deb
   
