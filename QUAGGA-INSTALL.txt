@@ -104,7 +104,10 @@ echo kernel.msgmni=1310720 > /etc/sysctl.d/86-msgmni.conf
 # Aplicar
 sysctl --system
 
-
+#executar rc.local
+chmod +x /etc/rc.local
+cd /etc/
+./rc.local
 
 #---------------------------------------------------------- QUAGGA / ZEBRA / OSPF / BGP
 
