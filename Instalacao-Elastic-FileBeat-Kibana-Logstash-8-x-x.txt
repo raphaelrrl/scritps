@@ -103,21 +103,55 @@ filebeat modules enable netflow
  systemctl restart elasticsearch.service
  
  
- #huawei
+ # CISCO EVE
+ip flow-cache timeout active 1
+ip flow-capture vlan-id
+ip flow-capture mac-addresses
+ip flow-export version 9 origin-as
+ip flow-export destination 10.99.98.2 2055
+ 
+
+#acessar interface uplink
+ ip flow ingress
+
+#Huawei NETSTREAM
+slot 3  
+ip netstream sampler to slot self
+ipv6 netstream sampler to slot self
+#
+ip netstream as-mode 32
 ip netstream timeout active 1
 ip netstream timeout inactive 15
 ip netstream export version 9 origin-as
 ip netstream export index-switch 32
-ip netstream export template timeout-rate 1
-ip netstream sampler fix-packets 1000 inbound
-ip netstream sampler fix-packets 1000 outbound
-ip netstream export source LOOPBACK
-ip netstream export host ELASTICSEARCH 2055
+ip netstream export template timeout-rate 2
+ip netstream sampler fix-packets 2048 inbound
+ip netstream sampler fix-packets 2048 outbound
+ip netstream export source IP-HUAWEI
+ip netstream export host IP-ELASTIC 2055
 ip netstream export template option sampler
+ip netstream export template option application-label
+ipv6 netstream as-mode 32
+ipv6 netstream timeout active 1
+ipv6 netstream timeout inactive 15
+ipv6 netstream export version 9 origin-as
+ipv6 netstream export index-switch 32
+ipv6 netstream export template timeout-rate 2
+ipv6 netstream sampler fix-packets 2048 inbound
+ipv6 netstream sampler fix-packets 2048 outbound
+ipv6 netstream export source IP-HUAWEI
+ipv6 netstream export host IP-ELASTIC 52055
+ipv6 netstream export template option export-stats
+ipv6 netstream export template option sampler
 
-# acessar interface uplink e adicionar comandos abaixo:
+# Acessar interface
  ip netstream inbound
  ip netstream outbound
+ ipv6 netstream inbound
+ ipv6 netstream outbound
+ 
+
+
 
 
 # CISCO
