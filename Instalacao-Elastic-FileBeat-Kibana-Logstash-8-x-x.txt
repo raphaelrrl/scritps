@@ -97,9 +97,9 @@ filebeat modules enable netflow
         - private
 
 # restart serviços
- filebeat setup
  systemctl enable filebeat
  service filebeat start
+ filebeat setup
  systemctl restart elasticsearch.service
  
  
