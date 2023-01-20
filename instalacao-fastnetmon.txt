@@ -96,7 +96,7 @@ http://localhost:8086
 graphite
 
 
-#BLACK-HOLE HUAWEI
+#BLACK-HOLE FRR
 ip prefix-list FASTNETMON-ADDRESS seq 5 permit 45.0.0.0/22 le 32
 !
 route-map FASTNETMON-IN deny 10
@@ -107,7 +107,7 @@ route-map FASTNETMON-OUT permit 10
 !
 router bgp 65001
  bgp router-id 10.100.0.2
- neighbor 10.100.0.1 remote-as 260072
+ neighbor 10.100.0.1 remote-as 65002
  neighbor 10.100.0.1 description "Huawei"
  !
  address-family ipv4 unicast
@@ -118,43 +118,44 @@ router bgp 65001
 end
 write memory
 
+#BLACK-HOLE HUAWEI
+
 community 666:666 LINK 01
 community 900:666 LINK 02
-
-
+#
 ip route-static 192.0.2.1 255.255.255.255 NULL0 description BH
-
+#
 ip ip-prefix  ACCEPT-FASTNETMON index 10 permit 0.0.0.0 0 greater-equal 32
 ip ip-prefix  IGNORE-FASTNETMON index 10 permit 45.0.0.0 30 greater-equal 28 less-equal 32
-
+#
 ip community-filter basic FASTNETMON-BH index 10 permit 65001:666
-
+#
 route-policy FASTNETMON-IN deny node 10
 if-match ip-prefix IGNORE-FASTNETMON
-
+#
 route-policy FASTNETMON-IN permit node 20
 if-match community-filter FASTNETMON-BH 
 apply local-preference 999
 apply ip-address next-hop 192.0.2.1
 apply community 666:666 900:666
 if-match ip-prefix ACCEPT-FASTNETMON
-
+#
 route-policy FASTNETMON-IN deny node 100
-
+#
 route-policy FASTNETMON-OUT deny node 100
-
+#
 ip community-filter basic BLACKHOLE index 10 permit 65006:666
-
-
+#
 route-policy LINK01-OUT permit node 20
 if-match community-filter BLACKHOLE
 apply community 666:666
-
+#
 route-policy LINK01-OUT permit node 20
 if-match community-filter BLACKHOLE
 apply community 900:666
+#
 
-#ajustar /32 publico OPCIONAL firewall NFTABLES
+#ajustar /32 publico OPCIONAL firewall NFTABLES FRR Fastnetmon
 nano /etc/network/interfaces
 allow-hotplug eno1
 iface eno1 inet static
