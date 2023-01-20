@@ -97,7 +97,7 @@ graphite
 
 
 #BLACK-HOLE HUAWEI
-ip prefix-list FASTNETMON-ADDRESS seq 5 permit 45.163.148.0/22 le 32
+ip prefix-list FASTNETMON-ADDRESS seq 5 permit 45.0.0.0/22 le 32
 !
 route-map FASTNETMON-IN deny 10
 !
@@ -118,14 +118,14 @@ router bgp 65001
 end
 write memory
 
-community 666:666 MIGO
-community 900:666 WEBBY
+community 666:666 LINK 01
+community 900:666 LINK 02
 
 
 ip route-static 192.0.2.1 255.255.255.255 NULL0 description BH
 
 ip ip-prefix  ACCEPT-FASTNETMON index 10 permit 0.0.0.0 0 greater-equal 32
-ip ip-prefix  IGNORE-FASTNETMON index 10 permit 45.163.148.136 30 greater-equal 28 less-equal 32
+ip ip-prefix  IGNORE-FASTNETMON index 10 permit 45.0.0.0 30 greater-equal 28 less-equal 32
 
 ip community-filter basic FASTNETMON-BH index 10 permit 65001:666
 
@@ -146,11 +146,11 @@ route-policy FASTNETMON-OUT deny node 100
 ip community-filter basic BLACKHOLE index 10 permit 65006:666
 
 
-route-policy AS263152-MIGO-OUT permit node 20
+route-policy LINK01-OUT permit node 20
 if-match community-filter BLACKHOLE
 apply community 666:666
 
-route-policy AS262493-WEBBY-OUT permit node 20
+route-policy LINK01-OUT permit node 20
 if-match community-filter BLACKHOLE
 apply community 900:666
 
