@@ -27,7 +27,6 @@ netflow_port =  52055
 netflow_host =  = 100.100.20.5
 ban_for_pps = on
 ban_for_bandwidth = on
-
 threshold_mbps = 1000
 threshold_flows = 3500
 
