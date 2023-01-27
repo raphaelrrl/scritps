@@ -70,6 +70,9 @@ dpkg -i snmp-mibs-downloader_1.5_all.deb
 sleep 20
 apt-get -y install smistrip
 
+#ajuste mib quebrada
+wget http://pastebin.com/raw.php?i=p3QyuXzZ -O /usr/share/snmp/mibs/ietf/SNMPv2-PDU
+
 clear
 figlet -c senha BD p455w0rd
 figlet -c FINALIZADO!
