@@ -69,7 +69,7 @@ wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.6.0-amd64.
 dpkg -i filebeat-8.6.0-amd64.deb
 
 # acessar arquivo de configuração do filebeat  /etc/filebeat/filebeat.yml e alterar endereço IP do elastic e kibana
-
+nano /etc/filebeat/filebeat.yml
 output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["10.99.98.2:9200"]
