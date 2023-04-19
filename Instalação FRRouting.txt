@@ -1,0 +1,112 @@
+#instalacao Dependencias bibliotecas Linux essenciais.
+apt-get -y update ; apt upgrade
+apt install -y build-essential cmake gcc linux-headers-`uname -r`
+apt install -y git libpcre3-dev libssl-dev wget make linux-headers-amd64
+
+#SNMP
+apt install -y snmpd snmp snmptrapd libsnmp-base libsnmp-dev
+
+#SMP - NUMA
+apt-get -y install numactl coreutils htop numactl numatop
+
+# Instalação FRR
+apt-get -y install frr
+apt-get -y install frr-pythontools
+apt-get -y install frr-rpki-rtrlib
+apt-get -y install frr-snmp
+
+# Ativar aplicativos do framework FRR:
+
+sed -i '/bgpd/s/=no/=yes/' /etc/frr/daemons
+sed -i '/ospfd/s/=no/=yes/' /etc/frr/daemons
+sed -i '/ospf6d/s/=no/=yes/' /etc/frr/daemons
+sed -i '/pbrd/s/=no/=yes/' /etc/frr/daemons
+sed -i '/bfdd/s/=no/=yes/' /etc/frr/daemons
+touch /etc/frr/frr.conf
+touch /etc/frr/vtysh.conf
+chown frr:frr /etc/frr/frr.conf /etc/frr/vtysh.conf
+chmod 640 /etc/frr/frr.conf /etc/frr/vtysh.conf
+
+# Ativar aplicativos do framework FRR:
+
+( echo 'hostname P-BGP-FASTNETMON'
+ echo 'ip forwarding'
+ echo 'ipv6 forwarding'
+ echo 'service integrated-vtysh-config'
+) > /etc/frr/frr.conf
+
+# - Ativar serviço (Debian: systemd):
+systemctl enable frr.service
+service frr stop
+service frr start
+
+systemctl status frr.service
+
+
+#aplicando BH.
+
+community 65001:666
+
+ip prefix-list fastnetmon-coord seq 5 permit 200.200.200.0/22 ge 22 le 32
+ip prefix-list fastnetmon-coord seq 10 permit 200.200.204.0/22 ge 22 le 32
+
+route-map MARK_FASTNETMON_IMPORT deny 10
+!
+route-map MARK_FASTNETMON_EXPORT permit 10
+ match ip address prefix-list FASTNETMON_EXPORT
+ set community 65001:666
+ 
+ router bgp 65001
+ bgp router-id 10.100.20.1
+ neighbor 10.100.20.1 remote-as 260072
+ neighbor 10.100.20.1 description "NE8K_BORDA"
+# neighbor 10.100.20.1 ebgp-multihop 255 # (Caso seja multihop)
+ !
+ address-family ipv4 unicast
+  neighbor 10.100.20.1 route-map MARK_FASTNETMON_IMPORT in
+  neighbor 10.100.20.1 route-map MARK_FASTNETMON_EXPORT out
+ exit-address-family
+ 
+#cisco
+passo 1 - Rota estatica apontando para Null0
+ip route 192.0.2.1 255.255.255.255 Null 0 name BACKHOLE
+
+passo 2 - prefixlist para prefixos meu asn 200.200.200.0 le 32
+ip prefix-list AS565002-FASTNETMON seq 5 permit 200.200.200.0/22 ge 32
+
+passo 3 - prefixlist ignora o IP publico do fastnetmon ( se o IP publico for atacado, voce não ira adicionar no BH.)
+ip prefix-list AS65002-FASTNETMON-NEGAR seq 5 permit 200.2
+
+passo 4 - communiti filter basic seq 10 65001:666
+ip community-list standard BH permit 65001:666
+
+passo 5 - route-map import - negando a accesslist do IP do fastnetmon, e aceito a access-list do meu bloco.
+			adicionar local-preferec, adicionar o nexthop para 192.0.2.1z
+			aplico a comunitie das minhas operadoras para BH.
+			math na access-list do meu ASN
+			Nega o resto
+passo 6 - criar o neigbors BGP com cisco x fastnetmon			
+
+
+ip route 192.0.2.1 255.255.255.255 Null0 name BACKHOLE
+ip community-list standard BH permit 65001:666
+
+ip prefix-list AS565002-FASTNETMON seq 5 permit 200.200.200.0/22 ge 32
+!
+ip prefix-list AS65002-FASTNETMON-NEGAR seq 5 permit 200.200.201.0/30 ge 32
+
+route-map AS65001-FASTNETMON-IN deny 5
+ match ip address prefix-list AS65002-FASTNETMON-NEGAR
+ 
+route-map AS65001-FASTNETMON-IN permit 10
+ match ip address prefix-list AS565002-FASTNETMON
+ match ip next-hop 192.0.2.1
+ set local-preference 999
+ set community 65003:666
+!
+route-map AS65001-FASTNETMON-IN deny 20
+
+route-map AS65003-OPERADORA-OUT permit 40
+match community 65003:666
+
+route-map AS65003-OPERADORA-OUT deny 100
