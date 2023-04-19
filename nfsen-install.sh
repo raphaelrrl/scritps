@@ -8,11 +8,11 @@ apt install nfdump
 nfdump -V
 
 #atualização de bibliotecas
-apt install build-essential autoconf make gcc wget
-apt install rrdtool mrtg librrds-perl librrdp-perl librrd-dev
-apt install libmailtools-perl bison 
-apt install flex libpcap-dev php libsocket6-perl apache2 php-common apache2-utils
-apt install libapache2-mod-php libtool dh-autoreconf pkg-config libbz2-dev byacc doxygen graphviz
+apt install -y build-essential autoconf make gcc wget
+apt install -y rrdtool mrtg librrds-perl librrdp-perl librrd-dev
+apt install -y libmailtools-perl bison 
+apt install -y flex libpcap-dev php libsocket6-perl apache2 php-common apache2-utils
+apt install -y libapache2-mod-php libtool dh-autoreconf pkg-config libbz2-dev byacc doxygen graphviz
 apt install -y libapache2-mod-php php php-mysql php-cli php-pear php-gmp php-gd 
 apt install -y php-bcmath  php-curl php-xml php-zip
 
