@@ -102,6 +102,9 @@ filebeat modules enable netflow
  filebeat setup
  systemctl restart elasticsearch.service
  
+ # Editar visualização TIMELION
+ .es(index="filebeat-*", metric="sum:network.bytes", split="source.ip:10", kibana=true).multiply(1024).scale_interval(30s).fit(mode=scale).if(operator="lt", if=0, then=0).lines(fill=2, stack=true,width=1).label(regex="^.* source.ip:(.+) > .*$", label="$1").yaxis(label="bits / sec",units="bits/s",min=0)
+ 
  
  # CISCO EVE
 ip flow-cache timeout active 1
