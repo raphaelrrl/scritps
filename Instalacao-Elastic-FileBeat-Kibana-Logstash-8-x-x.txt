@@ -103,10 +103,12 @@ filebeat modules enable netflow
  systemctl restart elasticsearch.service
  
  # Editar visualização TIMELION
+ #Source.bytes
  .es(index="filebeat-*", metric="sum:network.bytes", split="source.ip:10", kibana=true).multiply(1024).scale_interval(30s).fit(mode=scale).if(operator="lt", if=0, then=0).lines(fill=2, stack=true,width=1).label(regex="^.* source.ip:(.+) > .*$", label="$1").yaxis(label="bits / sec",units="bits/s",min=0)
- 
- 
- # CISCO EVE
+ #destination.bytes
+ .es(index="filebeat-*", metric="sum:network.bytes", split="destination.ip:10",kibana=true).multiply(1024).fit(mode=scale).if(operator="lt", if=0, then=0).lines(fill=2, stack=true,width=1).label(regex="^.* destination.ip:(.+) > .*$", label="$1").yaxis(label="bits / sec",units="bits/s",min=0)
+ #destination.port.bytes
+.es(index="filebeat-*", metric="sum:network.bytes", split="destination.port:10", kibana=true).multiply(1024).scale_interval(1s).fit(mode=scale).if(operator="lt", if=0, then=0).trim(start=2,end=1).label(regex="^.* destination.port:(.+) > .*$", label="$1").lines(width=1, stack=true, fill=1).yaxis(label="bits / sec",units="bits/s",min=0) # CISCO EVE
 ip flow-cache timeout active 1
 ip flow-capture vlan-id
 ip flow-capture mac-addresses
