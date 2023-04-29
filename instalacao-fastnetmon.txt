@@ -12,19 +12,20 @@
 # Adicionar prefixos publicos
 nano /etc/networks_list
 200.200.200.0/22
+2001:db8::/32
 
 #acessar arquivo de configuração do fastnetmon aplicar ajuste. 
-nano/etc/fastnetmon.conf
+nano /etc/fastnetmon.conf
 
 netflow = off/netflow = on
 average_calculation_time =  60
-average_calculation_time_for_subnets =  60
+#average_calculation_time_for_subnets =  60
 ban_time = 600
-enable_subnet_counters =  on
+#enable_subnet_counters =  on
 ban_for_flows = on
 threshold_pps =  50000
 netflow_port =  52055
-netflow_host =  = 100.100.20.5
+netflow_host = 100.100.20.5
 ban_for_pps = on
 ban_for_bandwidth = on
 threshold_mbps = 1000
@@ -96,8 +97,12 @@ http://localhost:8086
 graphite
 
 
-#BLACK-HOLE FRR
-ip prefix-list FASTNETMON-ADDRESS seq 5 permit 45.0.0.0/22 le 32
+#BLACK-HOLE FRR/HUAWEI
+# para testar o anuncio - 
+ip route 10.99.93.2 32 null0
+#
+
+ip prefix-list FASTNETMON-ADDRESS seq 5 permit 10.99.0.0/16 le 32
 !
 route-map FASTNETMON-IN deny 10
 !
@@ -105,57 +110,57 @@ route-map FASTNETMON-OUT permit 10
  match ip address prefix-list FASTNETMON-ADDRESS
  set community 65001:666
 !
-router bgp 65001
- bgp router-id 10.100.0.2
- neighbor 10.100.0.1 remote-as 65002
- neighbor 10.100.0.1 description "Huawei"
+router bgp 65
+ bgp router-id 10.10.0.2
+ neighbor 10.10.0.1 remote-as 65001
+ neighbor 10.10.0.1 description "Huawei"
  !
  address-family ipv4 unicast
-  neighbor 10.100.0.1 route-map MARK_FASTNETMON_IMPORT in
-  neighbor 10.100.0.1 route-map MARK_FASTNETMON_EXPORT out
+  neighbor 10.10.0.1 route-map MARK_FASTNETMON_IMPORT in
+  neighbor 10.10.0.1 route-map MARK_FASTNETMON_EXPORT out
  exit-address-family
 !
 end
 write memory
 
-#BLACK-HOLE HUAWEI
+community 666:666 OPERADORA-01
+community 900:666 OPERADORA-02
 
-community 666:666 LINK 01
-community 900:666 LINK 02
-#
+#huawei BGP
 ip route-static 192.0.2.1 255.255.255.255 NULL0 description BH
-#
+
 ip ip-prefix  ACCEPT-FASTNETMON index 10 permit 0.0.0.0 0 greater-equal 32
-ip ip-prefix  IGNORE-FASTNETMON index 10 permit 45.0.0.0 30 greater-equal 28 less-equal 32
-#
+ip ip-prefix  IGNORE-FASTNETMON index 10 permit 10.99.88.0 30 greater-equal 28 less-equal 32
+
 ip community-filter basic FASTNETMON-BH index 10 permit 65001:666
-#
+
 route-policy FASTNETMON-IN deny node 10
 if-match ip-prefix IGNORE-FASTNETMON
-#
+
 route-policy FASTNETMON-IN permit node 20
+if-match ip-prefix ACCEPT-FASTNETMON
 if-match community-filter FASTNETMON-BH 
 apply local-preference 999
 apply ip-address next-hop 192.0.2.1
 apply community 666:666 900:666
-if-match ip-prefix ACCEPT-FASTNETMON
-#
-route-policy FASTNETMON-IN deny node 100
-#
-route-policy FASTNETMON-OUT deny node 100
-#
-ip community-filter basic BLACKHOLE index 10 permit 65006:666
-#
-route-policy LINK01-OUT permit node 20
-if-match community-filter BLACKHOLE
-apply community 666:666
-#
-route-policy LINK01-OUT permit node 20
-if-match community-filter BLACKHOLE
-apply community 900:666
-#
 
-#ajustar /32 publico OPCIONAL firewall NFTABLES FRR Fastnetmon
+
+route-policy FASTNETMON-IN deny node 100
+
+route-policy FASTNETMON-OUT deny node 100
+
+ip community-filter basic BLACKHOLE-MEU-AS index 10 permit 65006:666
+
+
+route-policy AS-OPERADORA-01-OUT permit node 20
+if-match community-filter BLACKHOLE-MEU-AS
+apply community 666:666
+
+route-policy AS-OPERADORA-02-OUT permit node 20
+if-match community-filter BLACKHOLE-MEU-AS
+apply community 900:666
+
+#ajustar /32 publico OPCIONAL firewall NFTABLES
 nano /etc/network/interfaces
 allow-hotplug eno1
 iface eno1 inet static
