@@ -45,10 +45,10 @@ systemctl status frr.service
 
 #BLACK-HOLE FRR FASTNETMON
 # para testar o anuncio - 
-ip route 10.99.93.2 32 null0
+ip route 10.99.89.50/32 null0
 #
 
-ip prefix-list FASTNETMON-ADDRESS seq 5 permit 10.99.0.0/16 le 32
+ip prefix-list FASTNETMON-ADDRESS seq 5 permit 10.99.89.0/24 le 32
 !
 route-map FASTNETMON-IN deny 10
 !
@@ -139,3 +139,15 @@ route-map AS65003-OPERADORA-OUT permit 40
 match community 65003:666
 
 route-map AS65003-OPERADORA-OUT deny 100
+
+#HUAWEI
+
+#RT BACKHOLE
+ip route-static 192.0.2.1 255.255.255.255 NULL 0
+
+#ACL
+ip ip-prefix MITIGACAO-FASTNETMON index 10 permit 0.0.0.0 0 greater-equal 0 less-equal 32
+ip ip-prefix DENY-FASTNETMON index 10 permit 10.99.89.50 32 greater-equal 32 less-equal 32
+
+#COMMUNITI BASIC FASTNETMON
+ip community-filter basic FASTNETMON-BLACKHOLE permit 65001:666
