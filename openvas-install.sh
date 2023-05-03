@@ -1,25 +1,25 @@
 #!/bin/bash
 #atualizar SO	
 	apt update
-    apt upgrade
-    apt autoremove
+ 	apt upgrade
+	apt autoremove
 
 #Instalação Openvas	
 	apt install openvas
 	
-#iniciar serviço - '494d515d-d14b-4d84-abe0-4281fdb3d72d'
+#iniciar serviço - 
 	gvm-setup
-	sudo gvm-check-setup
 	
-	greenbone-feed-sync --type GVMD_DATA
-	greenbone-feed-sync --type SCAP
-	greenbone-feed-sync --type CERT
-	sudo -u _gvm greenbone-nvt-sync --rsync
-	greenbone-scapdata-sync
-	greenbone-certdata-sync
-	gvm-feed-update
-		
 #ajustar acesso via endereço IP externo
 	nano /usr/lib/systemd/system/greenbone-security-assistant.service
 	 systemctl daemon-reload
-	 gvm-start
+	gvm-check-setup
+	sudo -u _gvm greenbone-nvt-sync --rsync
+	greenbone-feed-sync --type GVMD_DATA
+	greenbone-feed-sync --type SCAP
+	greenbone-feed-sync --type CERT
+	greenbone-scapdata-sync
+	greenbone-certdata-sync
+	gvm-feed-update
+	gvm-start
+		
