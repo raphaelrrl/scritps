@@ -43,7 +43,36 @@ service frr start
 systemctl status frr.service
 
 
-#aplicando BH.
+#BLACK-HOLE FRR FASTNETMON
+# para testar o anuncio - 
+ip route 10.99.93.2 32 null0
+#
+
+ip prefix-list FASTNETMON-ADDRESS seq 5 permit 10.99.0.0/16 le 32
+!
+route-map FASTNETMON-IN deny 10
+!
+route-map FASTNETMON-OUT permit 10
+ match ip address prefix-list FASTNETMON-ADDRESS
+ set community 65001:666
+!
+router bgp 65
+ bgp router-id 10.10.0.2
+ neighbor 10.10.0.1 remote-as 65001
+ neighbor 10.10.0.1 description "Huawei"
+ !
+ address-family ipv4 unicast
+  neighbor 10.10.0.1 route-map MARK_FASTNETMON_IMPORT in
+  neighbor 10.10.0.1 route-map MARK_FASTNETMON_EXPORT out
+ exit-address-family
+!
+end
+write memory
+
+community 666:666 OPERADORA-01
+community 900:666 OPERADORA-02
+
+#aplicando BH CISCO
 
 community 65001:666
 
