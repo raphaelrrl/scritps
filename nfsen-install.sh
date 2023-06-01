@@ -38,7 +38,8 @@ $WWWGROUP = "www-data";
 %sourcers = (
 	'BGP'	=>{ 'port' => '9995', 'col' =>'#0000ff', 'type' => 'netflow' },
 	'BNG'	=>{ 'port' => '9996', 'col' =>'#00ffff', 'type' => 'netflow' },
-	
+);
+
 #ajustar RRD linha 76, alterar versão para 1.8
 nano /usr/src/nfsen-nfsen-1.3.8/libexec/NfSenRRD.pm
 
@@ -55,6 +56,8 @@ ps aux | grep nfsen
 # ajuste Aliase no apache
  nano /etc/apache2/sites-enabled/000-default.conf
 Alias /nfsen	/var/www/nfsen/
+
+# aplicar link simbolico
 ln -s /var/www/nfsen/nfsen.php /var/www/nfsen/index.php
 
 #startar o serviço
