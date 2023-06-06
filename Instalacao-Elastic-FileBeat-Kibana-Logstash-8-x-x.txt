@@ -211,19 +211,35 @@ ip flow monitor PP-NETFLOW-MONITOR output
 #juniper
 #Contrubuição Gelson Magdiel
 
-Se alguém precisar juniper:
+set services flow-monitoring version-ipfix template FLOW-EXPORTER flow-active-timeout 60
+set services flow-monitoring version-ipfix template FLOW-EXPORTER flow-inactive-timeout 15
+set services flow-monitoring version-ipfix template FLOW-EXPORTER template-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW-EXPORTER option-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW-EXPORTER ipv4-template
+set services flow-monitoring version-ipfix template FLOW-EXPORTER-v6 flow-active-timeout 60
+set services flow-monitoring version-ipfix template FLOW-EXPORTER-v6 flow-inactive-timeout 15
+set services flow-monitoring version-ipfix template FLOW-EXPORTER-v6 template-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW-EXPORTER-v6 option-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW-EXPORTER-v6 ipv6-template
+set chassis fpc 0 sampling-instance FLOW-EXPORTER
+set chassis fpc 0 inline-services flow-table-size ipv4-flow-table-size 10
+set chassis fpc 0 inline-services flow-table-size ipv6-flow-table-size 5
+set forwarding-options sampling instance FLOW-EXPORTER input rate 1000
+set forwarding-options sampling instance FLOW-EXPORTER input run-length 0
+set forwarding-options sampling instance FLOW-EXPORTER input max-packets-per-second 10000
+set forwarding-options sampling instance FLOW-EXPORTER family inet output flow-inactive-timeout 15
+set forwarding-options sampling instance FLOW-EXPORTER family inet output flow-active-timeout 60
+set forwarding-options sampling instance FLOW-EXPORTER family inet output flow-server 10.1.1.1 port 2055
+set forwarding-options sampling instance FLOW-EXPORTER family inet output flow-server 10.1.1.1 autonomous-system-type origin
+set forwarding-options sampling instance FLOW-EXPORTER family inet output flow-server 10.1.1.1 version-ipfix template FLOW-EXPORTER
+set forwarding-options sampling instance FLOW-EXPORTER family inet output inline-jflow source-address 10.1.1.2
+set forwarding-options sampling instance FLOW-EXPORTER family inet6 output flow-inactive-timeout 15
+set forwarding-options sampling instance FLOW-EXPORTER family inet6 output flow-active-timeout 60
+set forwarding-options sampling instance FLOW-EXPORTER family inet6 output flow-server 10.1.1.1 port 2055
+set forwarding-options sampling instance FLOW-EXPORTER family inet6 output flow-server 10.1.1.1 autonomous-system-type origin
+set forwarding-options sampling instance FLOW-EXPORTER family inet6 output flow-server 10.1.1.1 version-ipfix template FLOW-EXPORTER-v6
+set forwarding-options sampling instance FLOW-EXPORTER family inet6 output inline-jflow source-address 10.1.1.2
 
-set system time-zone America/Sao_Paulo
-set system ntp server 200.160.0.8
-set system ntp server 200.189.40.8
-
-set interfaces ge-0/0/0 description "Fala com o Netflow"
-set interfaces ge-0/0/0 unit 0 family inet address 192.168.210.49/24
-
-set interfaces ge-0/0/1 description "INTERFACE WAN - TRANSITO IP"
-set interfaces ge-0/0/1 unit 0 family inet sampling input
-set interfaces ge-0/0/1 unit 0 family inet address 200.200.200.1/30
-
-set forwarding-options sampling input rate 500
-set forwarding-options sampling family inet output flow-server 192.168.210.47 port 2055
-set forwarding-options sampling family inet output flow-server 192.168.210.47 version 5
+### Em cada interface e cada unit adicionar os comandos
+set interfaces xe-2/0/0 unit 151 family inet sampling input
+set interfaces xe-2/0/0 unit 151 family inet6 sampling input
