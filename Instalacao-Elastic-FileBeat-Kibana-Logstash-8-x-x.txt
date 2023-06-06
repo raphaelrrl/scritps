@@ -206,3 +206,23 @@ flow record PP-NETFLOW-REC
 interface Port-channel1.[SUB-INTERFACE-ID]
 ip flow monitor PP-NETFLOW-MONITOR input
 ip flow monitor PP-NETFLOW-MONITOR output
+
+
+#juniper
+
+Se alguém precisar juniper:
+
+set system time-zone America/Sao_Paulo
+set system ntp server 200.160.0.8
+set system ntp server 200.189.40.8
+
+set interfaces ge-0/0/0 description "Fala com o Netflow"
+set interfaces ge-0/0/0 unit 0 family inet address 192.168.210.49/24
+
+set interfaces ge-0/0/1 description "INTERFACE WAN - TRANSITO IP"
+set interfaces ge-0/0/1 unit 0 family inet sampling input
+set interfaces ge-0/0/1 unit 0 family inet address 200.200.200.1/30
+
+set forwarding-options sampling input rate 500
+set forwarding-options sampling family inet output flow-server 192.168.210.47 port 2055
+set forwarding-options sampling family inet output flow-server 192.168.210.47 version 5
