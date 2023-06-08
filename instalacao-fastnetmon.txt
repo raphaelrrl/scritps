@@ -74,8 +74,6 @@ nano /etc/influxdb/influxdb.conf
   protocol = "tcp"
   consistency-level = "one"
   separator = "."
-  batch-size = 5000 # will flush if this many points get buffered
-  batch-timeout = "1s" # will flush at least this often even if we haven't hit buffer limit
   templates = [
     "fastnetmon.hosts.* app.measurement.cidr.direction.function.resource",
     "fastnetmon.networks.* app.measurement.cidr.direction.resource",
