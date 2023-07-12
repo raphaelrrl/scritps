@@ -35,7 +35,7 @@ $HTMLDIR = "/var/www/nfsen/";
 $PREFIX = '/usr/bin';
 $USER = "www-data";
 $WWWGROUP = "www-data";
-%sourcers = (
+%sources = (
 	'BGP'	=>{ 'port' => '9995', 'col' =>'#0000ff', 'type' => 'netflow' },
 	'BNG'	=>{ 'port' => '9996', 'col' =>'#00ffff', 'type' => 'netflow' },
 );
