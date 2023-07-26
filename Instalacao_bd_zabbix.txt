@@ -38,7 +38,7 @@ apt install -y zabbix-server-mysql zabbix-sql-scripts  zabbix-agent
 
 ##importando base de dados do zabbix
 
-zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uroot -pp455w0rd zabbix
+zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -pp455w0rd zabbix
 
 ## Liberar conexão no bando de dados
 
