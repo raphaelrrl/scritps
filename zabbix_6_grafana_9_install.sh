@@ -1,8 +1,8 @@
 #!/bin/bash
 #Autor: Raphael Rodrigues
-#Homologado para Debian 11 LTS
+#Homologado para Debian 12 LTS
 #Baixe o script, execute o comando chmod +x zabbix_6_grafana_9_install.sh para permissão de execução.
-#Em seguida execute o comando ./zabbix_6_grafana_9_install.sh
+#Em seguida execute o comando ./zabbix_6_grafana_10_install.sh
 
 # Upgrade do SO
 apt update
@@ -23,8 +23,8 @@ useradd zabbix
 
 ##bem, chegou a hora de baixar o nosso zabbix.
 cd /tmp
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4%2Bdebian11_all.deb
-dpkg -i zabbix-release_6.0-4+debian11_all.deb
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb
+dpkg -i zabbix-release_6.0-5+debian12_all.deb
 sleep 3
 apt update -y ; apt upgrade -y
 apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
