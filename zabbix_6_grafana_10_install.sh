@@ -23,11 +23,11 @@ useradd zabbix
 
 ##bem, chegou a hora de baixar o nosso zabbix.
 cd /tmp
-wget https://repo.zabbix.com/zabbix/6.0/debian-arm64/pool/main/z/zabbix-release/zabbix-release_6.0-6+debian12_all.deb
-dpkg -i zabbix-release_6.0-6+debian12_all.deb
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb
+dpkg -i zabbix-release_6.0-5+debian12_all.deb
 sleep 3
 apt update -y ; apt upgrade -y
-apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
+apt apt install zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
 
 ##agora que o nosso banco de dados esta instalado vamos criar a base que ira receber os dados do zabbix.
 export DEBIAN_FRONTEND=noninteractive
