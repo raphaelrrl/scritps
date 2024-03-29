@@ -23,8 +23,8 @@ useradd zabbix
 
 ##bem, chegou a hora de baixar o nosso zabbix.
 cd /tmp
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb
-dpkg -i zabbix-release_6.0-5+debian12_all.deb
+wget https://repo.zabbix.com/zabbix/6.0/debian-arm64/pool/main/z/zabbix-release/zabbix-release_6.0-6+debian12_all.deb
+dpkg -i zabbix-release_6.0-6+debian12_all.deb
 sleep 3
 apt update -y ; apt upgrade -y
 apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
@@ -34,7 +34,7 @@ export DEBIAN_FRONTEND=noninteractive
 mariadb -uroot -e "create database zabbix character set utf8mb4 collate utf8mb4_bin";
 mariadb -uroot -e "create user 'zabbix'@'localhost' identified by 'p455w0rd'";
 mariadb -uroot -e "grant all privileges on zabbix.* to 'zabbix'@'localhost'";
-zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -pp455w0rd zabbix
+zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -pp455w0rd zabbix
 echo 'Populando base de dados zabbix, pode demorar um pouco dependendo do hardware'
 sleep 10
 sed -i 's/# DBPassword=/DBPassword=p455w0rd/' /etc/zabbix/zabbix_server.conf
