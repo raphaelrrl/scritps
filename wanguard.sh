@@ -523,6 +523,7 @@ set protocols bgp group WANGUARD type internal
 set protocols bgp group WANGUARD local-address IP-ROTEADOR
 set protocols bgp group WANGUARD family inet unicast
 set protocols bgp group WANGUARD family inet flow no-validate flowspec_import
+
 set protocols bgp group WANGUARD neighbor IP-WANGUARD description IBGP_WANGUARD
 set protocols bgp group WANGUARD neighbor IP-WANGUARD local-address IP-ROTEADOR
 set protocols bgp group WANGUARD neighbor IP-WANGUARD import flowspec_import
