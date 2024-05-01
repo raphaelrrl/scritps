@@ -422,32 +422,32 @@ route-policy ACCEPT-ALL permit node 65535
 route-policy DENY-ALL deny node 65535
 #
 
-bgp 253344
-    peer 45.255.128.2 as-number 253344
-    peer 45.255.128.2 description WANGUARD-IPV4
-    peer 45.255.128.2 connect-interface LoopBack0
-    peer 45.255.128.2 timer connect-retry 1
+bgp 65001
+    peer IP-WANGUARD as-number 65001
+    peer IP-WANGUARD description WANGUARD-IPV4
+    peer IP-WANGUARD connect-interface LoopBack0
+    peer IP-WANGUARD timer connect-retry 1
 
     ipv4-family unicast
-        peer 45.255.128.2 enable
+        peer IP-WANGUARD enable
 y
-        peer 45.255.128.2 route-policy ACCEPT-ALL import
-        peer 45.255.128.2 route-policy DENY-ALL export
-        peer 45.255.128.2 advertise-community
-        peer 45.255.128.2 advertise-ext-community
-        peer 45.255.128.2 advertise-large-community
-        peer 45.255.128.2 reflect-client
+        peer IP-WANGUARD route-policy ACCEPT-ALL import
+        peer IP-WANGUARD route-policy DENY-ALL export
+        peer IP-WANGUARD advertise-community
+        peer IP-WANGUARD advertise-ext-community
+        peer IP-WANGUARD advertise-large-community
+        peer IP-WANGUARD reflect-client
 
     ipv4-family flow
-        peer 45.255.128.2 enable
+        peer IP-WANGUARD enable
 y
-        peer 45.255.128.2 redirect ip rfc-compatible
-        peer 45.255.128.2 route-policy ACCEPT-ALL import
-        peer 45.255.128.2 route-policy DENY-ALL export
-        peer 45.255.128.2 validation-disable
-        peer 45.255.128.2 advertise-community
-        peer 45.255.128.2 advertise-large-community
-        peer 45.255.128.2 reflect-client
+        peer IP-WANGUARD redirect ip rfc-compatible
+        peer IP-WANGUARD route-policy ACCEPT-ALL import
+        peer IP-WANGUARD route-policy DENY-ALL export
+        peer IP-WANGUARD validation-disable
+        peer IP-WANGUARD advertise-community
+        peer IP-WANGUARD advertise-large-community
+        peer IP-WANGUARD reflect-client
         route validation-mode include-as
 #
 commit
@@ -477,10 +477,10 @@ ntp-service ipv6 source-interface LoopBack0
 
 
 # Usando WanGuard local - Via IPv4
-ntp-service unicast-peer      45.255.128.2 source-interface LoopBack 0
+ntp-service unicast-peer     IP-WANGUARD source-interface LoopBack 0
 
 # Usando WanGuard local - Via IPv6
-ntp-service unicast-peer ipv6 2804:fada:beba:cafe::2 source-interface LoopBack0
+ntp-service unicast-peer ipv6 IP-WANGUARD-V6 source-interface LoopBack0
 
 
 # Via IPv4 em NTP publico (use uma interface que tenha ipv4 publico navegavel)
