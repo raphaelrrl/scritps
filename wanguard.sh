@@ -71,11 +71,7 @@ apt-get -y update
 apt-get -y upgrade
 
 # Instalar pacotes
-apt-get -y install apt-transport-https
-apt-get -y install wget
-apt-get -y install gnupg
-apt-get -y install python3-pysimplesoap
-apt-get -y install ntp unzip curl net-tools tcpdump
+apt-get -y install apt-transport-https build-essential gnupg wget python3-pysimplesoap ntp unzip curl net-tools tcpdump
 
 #SNMP
 apt install -y snmpd snmp snmptrapd libsnmp-base libsnmp-dev
@@ -84,8 +80,7 @@ apt install -y snmpd snmp snmptrapd libsnmp-base libsnmp-dev
 apt-get -y install numactl coreutils htop numactl numatop
 
 # time-zone
-apt-get -y install ntpdate
-apt-get -y install systemd-timesyncd
+apt-get -y install ntpdate systemd-timesyncd
 
 # Sincronismo data hora
 timedatectl set-timezone America/Sao_Paulo
