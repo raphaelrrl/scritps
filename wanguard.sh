@@ -577,3 +577,34 @@ set firewall family inet filter protect-re term aceita-ntp then policer limit-32
 set firewall family inet filter protect-re term aceita-ntp then accept
 
 # *Recomendo adicionar export netflow somente nas interfaces UPLINK e Troca de Trafego - Ex transito IP, IXBR, CDN, PNI, IX Internacional*
+# Exemplo CISCO (ignore erros)
+#---------------------------------------------------------------------------------
+# Segue dados para estabelecer peer bgp entre CISCO  e wanguard.
+
+ip nat log translations flow-export v9 udp destination IPDOCOLETADOR 2055
+ip nat translation timeout 700
+ip nat translation tcp-timeout 100
+ip nat translation pptp-timeout 200
+ip nat translation udp-timeout 100
+ip nat translation finrst-timeout 30
+ip nat translation syn-timeout 30
+ip nat translation dns-timeout 30
+ip nat translation routemap-entry-timeout 30
+ip nat translation icmp-timeout 10
+ip nat translation port-timeout tcp 443 300
+ip nat translation port-timeout udp 443 300
+
+
+flow record IPDOCOLETADOR
+match ipv4 tos
+match ipv4 protocol
+match ipv4 source address
+match ipv4 destination address
+match transport source-port
+match transport destination-port
+match interface input
+collect interface output
+collect counter bytes
+collect counter packets
+
+export-protocol netflow-v9
