@@ -14,7 +14,7 @@ apt install -y libmailtools-perl bison
 apt install -y flex libpcap-dev php libsocket6-perl apache2 php-common apache2-utils
 apt install -y libapache2-mod-php libtool dh-autoreconf pkg-config libbz2-dev byacc doxygen graphviz
 apt install -y libapache2-mod-php php php-mysql php-cli php-pear php-gmp php-gd 
-apt install -y php-bcmath  php-curl php-xml php-zip
+apt install -y php-bcmath  php-curl php-xml php-zip git tcpdump
 
 #instalar modulo MCPAN
 perl -MCPAN -e 'install socket6'
@@ -24,6 +24,11 @@ cd /usr/src/
 wget https://github.com/p-alik/nfsen/archive/refs/tags/nfsen-1.3.8.tar.gz
 tar -zxvf nfsen-1.3.8.tar.gz
 cd /usr/src/nfsen-nfsen-1.3.8
+cp etc/nfsen-dist.conf /etc/nfsen.conf
+
+#instalar versão compativel com nfdump 1.7
+git clone https://github.com/phaag/nfsen
+cd /nfsen
 cp etc/nfsen-dist.conf /etc/nfsen.conf
 
 #editar o arquivo de configuração do nfsen
