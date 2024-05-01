@@ -42,7 +42,7 @@ sed -i 's/# DBPassword=/DBPassword=p455w0rd/' /etc/zabbix/zabbix_server.conf
 ##timezone php, execute o commando abaixo, em seguida edite que arquivo de configuração etc/zabbix/apache.conf como descrito abaixo:
 timedatectl set-timezone America/Sao_Paulo
 sed -i 's/# php_value date.timezone Europe\/Riga/php_value date.timezone America\/Sao_Paulo/g' /etc/apache2/conf-enabled/zabbix.conf
- sed -i 's#/var/www/html#/opt/andrisoft/webroot#g' /etc/apache2/sites-available/000-default.conf
+sed -i 's#/var/www/html#/usr/share/zabbix#g' /etc/apache2/sites-available/000-default.conf
 systemctl enable zabbix-server zabbix-agent
 systemctl restart zabbix-server zabbix-agent apache2
 systemctl status zabbix-server
