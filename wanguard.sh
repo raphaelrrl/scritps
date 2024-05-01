@@ -546,4 +546,33 @@ set forwarding-options sampling instance WANGUARD family inet6 output flow-serve
 set forwarding-options sampling instance WANGUARD family inet6 output flow-server IP-WANGUARD autonomous-system-type originset 
 set forwarding-options sampling instance WANGUARD family inet6 output flow-server IP-WANGUARD version-ipfix template WANGUARD-v6
 
+-
+set services flow-monitoring version-ipfix template FLOW flow-active-timeout 15
+set services flow-monitoring version-ipfix template FLOW flow-inactive-timeout 15
+set services flow-monitoring version-ipfix template FLOW template-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW option-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW ipv4-template
+set services flow-monitoring version-ipfix template FLOW-v6 flow-active-timeout 15
+set services flow-monitoring version-ipfix template FLOW-v6 flow-inactive-timeout 15
+set services flow-monitoring version-ipfix template FLOW-v6 template-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW-v6 option-refresh-rate seconds 30
+set services flow-monitoring version-ipfix template FLOW-v6 ipv6-template
+
+set forwarding-options sampling instance FLOW family inet output flow-server IP-WANGUARD port 2056
+set forwarding-options sampling instance FLOW family inet output flow-server IP-WANGUARD autonomous-system-type origin
+set forwarding-options sampling instance FLOW family inet output flow-server IP-WANGUARD version-ipfix template WANGUARD
+set forwarding-options sampling instance FLOW-V6 family inet6 output flow-server IP-WANGUARD port 2056
+set forwarding-options sampling instance FLOW-V6 family inet6 output flow-server IP-WANGUARD autonomous-system-type origin
+set forwarding-options sampling instance FLOW-V6 family inet6 output flow-server IP-WANGUARD version-ipfix template WANGUARD-v6
+
+set policy-options prefix-list ntp-servers
+set policy-options prefix-list ntp-servers 200.189.40.8/32
+
+set firewall family inet filter protect-re term aceita-ntp from prefix-list ntp-servers
+set firewall family inet filter protect-re term aceita-ntp from prefix-list localhost
+set firewall family inet filter protect-re term aceita-ntp from protocol udp
+set firewall family inet filter protect-re term aceita-ntp from port ntp
+set firewall family inet filter protect-re term aceita-ntp then policer limit-32k
+set firewall family inet filter protect-re term aceita-ntp then accept
+
 # *Recomendo adicionar export netflow somente nas interfaces UPLINK e Troca de Trafego - Ex transito IP, IXBR, CDN, PNI, IX Internacional*
