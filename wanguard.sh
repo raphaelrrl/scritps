@@ -65,7 +65,7 @@
 # Recomendado: usar o WanGuard como servidor NTP para que o relogio
 #              dele e de todos os equipamentos sejam sincronizados
 #              fielmente
-
+#
 # Begin :)
 apt-get -y update
 apt-get -y upgrade
@@ -131,7 +131,7 @@ echo "deb [signed-by=/usr/share/keyrings/andrisoft-keyring.gpg] https://www.andr
     ) > /etc/mysql/mariadb.conf.d/50-mysqld_safe.cnf
 
 # Adicionando senha root
-mysqladmin -u root password W4ngu4rd1!
+mysqladmin -u root password W4ngu4rd1
 
 # Ajustes MariaDB server.cnf
 (
@@ -180,7 +180,7 @@ mysqladmin -u root password W4ngu4rd1!
     systemctl restart mariadb
 
 # ou limpar Config mariadb
-# mysqladmin -u root password W4ngu4rd1!
+# mysqladmin -u root password W4ngu4rd1
 # sed -i '/^[^#]/ s/\(^.*bind-address.*$\)/#\ \1/' /etc/mysql/mariadb.conf.d/50-server.cnf
 # Instalar o banco de dados inicial do MariaDB
 # mysql_secure_installation
@@ -210,20 +210,18 @@ mysqladmin -u root password W4ngu4rd1!
     ) > /etc/motd
 
 # Criar login andrisoft
-    mysql -uroot -pW4ngu4rd1! -e "CREATE DATABASE andrisoft;"
+	export DEBIAN_FRONTEND=noninteractive
+    mysql -uroot -pW4ngu4rd1 -e "CREATE DATABASE andrisoft;"
 
     # Criar usuario andrisoft
-    mysql -uroot -ptulipasql -e "CREATE USER IF NOT EXISTS 'andrisoft'@'localhost' identified by 'W4ngu4rd1!';"
-    mysql -uroot -ptulipasql -e "GRANT ALL PRIVILEGES ON andrisoft.* TO 'andrisoft'@'localhost' IDENTIFIED BY 'W4ngu4rd1!';"
-    mysql -uroot -ptulipasql -e "FLUSH PRIVILEGES;"
-    mysql -uroot -ptulipasql -e "UNINSTALL PLUGIN validate_password;" 2>/dev/null
+    mysql -uroot -pW4ngu4rd1 -e "CREATE USER IF NOT EXISTS 'andrisoft'@'localhost' identified by W4ngu4rd1';"
+    mysql -uroot -pW4ngu4rd1 -e "GRANT ALL PRIVILEGES ON andrisoft.* TO 'andrisoft'@'localhost' IDENTIFIED BY W4ngu4rd1';"
+    mysql -uroot -pW4ngu4rd1 -e "FLUSH PRIVILEGES;"
+    mysql -uroot -pW4ngu4rd1 -e "UNINSTALL PLUGIN validate_password;" 2>/dev/null
 
     # Criar database andrisoft
-    mysql -uroot -pW4ngu4rd1! andrisoft < /opt/andrisoft/sql/andrisoft.sql
-    mysql -uroot -pW4ngu4rd1! andrisoft < /opt/andrisoft/sql/as_numbers.sql
-
-# *** Escolha um dos modos de config (modo 1 e' mais rapido, so colar!)
-
+    mysql -uroot -pW4ngu4rd1 andrisoft < /opt/andrisoft/sql/andrisoft.sql
+    mysql -uroot -pW4ngu4rd1 andrisoft < /opt/andrisoft/sql/as_numbers.sql
 
     # CONFIG MODO 1 - Manualmente:
     # - IPs para escutar a interface web
@@ -239,11 +237,10 @@ mysqladmin -u root password W4ngu4rd1!
         echo -n wanguardsql > /opt/andrisoft/etc/dbpass.conf
 
     # - Testar acesso ao banco de dados com as credenciais do wanguard:
-        mysql -uandrisoft -pW4ngu4rd1! andrisoft -e "SHOW TABLES;"
+        mysql -uandrisoft -pW4ngu4rd1 andrisoft -e "SHOW TABLES;"
 
     # - IP Wan de gerencia:
     #    mysql -uandrisoft -pwanguardsql andrisoft -e "update wanserver set ip = 'IP-DO-SERVIDOR' where ip = '127.0.0.1';"
-
 #Configuração do wanguard Wizard interativo
 # /opt/andrisoft/bin/install_console
 # /opt/andrisoft/bin/install_supervisor
@@ -258,10 +255,8 @@ cp /opt/andrisoft/etc/influxdb.conf /etc/influxdb/influxdb.conf
 systemctl restart influxdb
 /opt/andrisoft/bin/install_influxdb
 
-
 # SysCTL - Tuning universal
 #=================================================================================
-
     (
         echo  "net.core.rmem_default=31457280"
         echo  "net.core.wmem_default=31457280"
@@ -288,7 +283,6 @@ systemctl restart influxdb
     )  >  /etc/sysctl.d/052-net-tcp-ipv4.conf
 
     echo "net.ipv4.ip_local_port_range=1024 65535" >  /etc/sysctl.d/056-port-range-ipv4.conf
-
     echo "net.ipv4.ip_default_ttl=128"             >  /etc/sysctl.d/062-default-ttl-ipv4.conf
 
     (
@@ -333,19 +327,15 @@ systemctl restart influxdb
         echo "fs.mqueue.queues_max=4096"
         echo "fs.pipe-max-size=8388608"
     )  >  /etc/sysctl.d/072-fs-options.conf
-
     echo  "vm.swappiness=1"                      >  /etc/sysctl.d/073-swappiness.conf
     echo  "vm.vfs_cache_pressure=50"             >  /etc/sysctl.d/074-vfs-cache-pressure.conf
-
     echo  "kernel.panic=3"                       >  /etc/sysctl.d/081-kernel-panic.conf
     echo  "kernel.threads-max=1031306"           >  /etc/sysctl.d/082-kernel-threads.conf
     echo  "kernel.pid_max=262144"                >  /etc/sysctl.d/083-kernel-pid.conf
     echo  "kernel.msgmax=327680"                 >  /etc/sysctl.d/084-kernel-msgmax.conf
     echo  "kernel.msgmnb=655360"                 >  /etc/sysctl.d/085-kernel-msgmnb.conf
     echo  "kernel.msgmni=32768"                  >  /etc/sysctl.d/086-kernel-msgmni.conf
-
     echo  "vm.min_free_kbytes = 32768"           >  /etc/sysctl.d/087-kernel-free-min-kb.conf
-
 
  # Aplicar:
     sysctl -p 2>/dev/null 1>/dev/null
@@ -353,7 +343,6 @@ systemctl restart influxdb
 
 # Licenciamento do WanGuard
 #=================================================================================
-
     # Acesse:
     #    https://www.andrisoft.com/store/user/form
     #
@@ -361,7 +350,6 @@ systemctl restart influxdb
     #
     # Confirme o email de ativacao da conta
     #
-
     # Acesse seu servidor via HTTP (nao e' https), porta 80
     #
     # Vai aparecer a tela do wanguard com o checklist da instalacao
@@ -369,8 +357,6 @@ systemctl restart influxdb
     # Observe o botao "Upload License Key", precisa usar ele para
     # fazer upload da licenca.
     #
-
-
     # 1 - Licenca TRIAL
     #     Acesse:        https://www.andrisoft.com/trial/registration
     #
@@ -378,8 +364,6 @@ systemctl restart influxdb
     #
     #     Aguarde a licenca de teste no seu e-mail
     #
-
-
     # 2 - Licencas:
     #     Acesse:       https://www.andrisoft.com/store/software
     #
@@ -399,8 +383,6 @@ systemctl restart influxdb
     # - DPDK Engine license (~ $1410)
     #   - semelhante ao Filter mas com DPDK (40g+ trafego)
     #
-
-
     # Primeiro acesso: http://IP-DO-SERVIDOR/
     # Login e senha padrao:
     #    admin / changeme
@@ -409,19 +391,14 @@ systemctl restart influxdb
     # - no canto SUPERIOR DIREITO, click no icone do login "admin"
     #   tem o menu "Change Password"
     #   > informe a nova senha
-
-
 # Peering entre o roteador e o WanGuard para injecao BGP (ipv4 e flowspec)
 #=================================================================================
-
 # Exemplo HUAWEI (ignore erros)
 #---------------------------------------------------------------------------------
-
 route-policy ACCEPT-ALL permit node 65535
 #
 route-policy DENY-ALL deny node 65535
 #
-
 bgp 65001
     peer IP-WANGUARD as-number 65001
     peer IP-WANGUARD description WANGUARD-IPV4
@@ -456,16 +433,12 @@ y
 
 # Sincronizar data/hora via NTP (usar o proprio WanGuard como NTP Server)
 #========================================================================
-
 # Obs 1: (somente na VS-ADMIN)
 # Obs 2: (ignorar erros no "y", as vezes pede, as vezes nao pede)
-
 ntp-service server disable
 y
-
 ntp-service ipv6 server disable
 y
-
 ntp-service server source-interface all disable
 y
 ntp-service ipv6 server source-interface all disable
@@ -475,30 +448,24 @@ y
 ntp-service      source-interface LoopBack 0
 ntp-service ipv6 source-interface LoopBack0
 
-
 # Usando WanGuard local - Via IPv4
 ntp-service unicast-peer     IP-WANGUARD source-interface LoopBack 0
 
 # Usando WanGuard local - Via IPv6
 ntp-service unicast-peer ipv6 IP-WANGUARD-V6 source-interface LoopBack0
 
-
 # Via IPv4 em NTP publico (use uma interface que tenha ipv4 publico navegavel)
 #ntp-service unicast-peer 200.160.0.8   source-interface LoopBack0
 #ntp-service unicast-peer 200.189.40.8  source-interface LoopBack0
-
 # Via IPv6 em NTP publico (use uma interface que tenha ipv6 global navegavel)
 #ntp-service unicast-peer ipv6 2001:12F8:9:1::8  source-interface LoopBack0
 #ntp-service unicast-peer ipv6 2001:12FF::8      source-interface LoopBack0
-
-
 commit
 run save
 y
 
 # Config netstream geral
 #========================================================================
-
 ip netstream as-mode 32
 ip netstream timeout active 1
 ip netstream timeout inactive 15
@@ -524,16 +491,13 @@ ipv6 netstream sampler fix-packets 1024 inbound
 ipv6 netstream sampler fix-packets 1024 outbound
 ipv6 netstream export template option sampler
 #
-
 # Ativar CPU para flow na controladora
 #========================================================================
-
 # F1A:
   slot 1
     ip netstream sampler to slot self
     ipv6 netstream sampler to slot self
   commit
-
 
 # NE 8000 M8
   slot 10
