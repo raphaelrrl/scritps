@@ -108,12 +108,7 @@ echo "deb [signed-by=/usr/share/keyrings/andrisoft-keyring.gpg] https://www.andr
 
 # Instalar pacotes essenciais:
  apt update
- apt-get -y install wanbgp
- apt-get -y install python3-pip
- apt-get -y install exabgp
- apt-get -y install wanconsole
- apt-get -y install wansupervisor
- apt-get -y install wanfilter
+ apt-get -y install wanbgp python3-pip exabgp wanconsole wansupervisor wanfilter
 
 # Fixar timezone no PHP 8 (coloque o mesmo timezone do sistema)
  sed -i 's#;date.timezone.*#date.timezone=America/Sao_Paulo#g' \
