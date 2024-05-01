@@ -433,8 +433,6 @@ y
 
 # Sincronizar data/hora via NTP (usar o proprio WanGuard como NTP Server)
 #========================================================================
-# Obs 1: (somente na VS-ADMIN)
-# Obs 2: (ignorar erros no "y", as vezes pede, as vezes nao pede)
 ntp-service server disable
 y
 ntp-service ipv6 server disable
@@ -504,3 +502,48 @@ ipv6 netstream export template option sampler
     ip netstream sampler to slot self
     ipv6 netstream sampler to slot self
   commit
+# Exemplo JUNIPER (ignore erros)
+#---------------------------------------------------------------------------------
+# Segue dados para estabelecer peer bgp entre Juniper e wanguard.
+# Lado Juniper MX204 
+
+ set routing-options flow term-order standard
+ set policy-options community wanguard_flowspec members 64496:500
+ set policy-options community wanguard_flowspec members 64496:500
+ set policy-options policy-statement flowspec_import term flowspec_in from community wanguard_flowspec
+ set policy-options policy-statement flowspec_import term flowspec_in from community wanguard_flowspec
+ set policy-options policy-statement flowspec_import term flowspec_in then accept  set routing-options flow term-order standard
+ set policy-options policy-statement flowspec_import term flowspec_in then accept
+
+set protocols bgp group WANGUARD neighbor IP-BGP local-address IP-PEER
+set protocols bgp group WANGUARD family inet flow
+set protocols bgp group WANGUARD family inet flow no-validate flowspec_import
+
+set protocols bgp group WANGUARD type internal
+set protocols bgp group WANGUARD local-address IP-ROTEADOR
+set protocols bgp group WANGUARD family inet unicast
+set protocols bgp group WANGUARD family inet flow no-validate flowspec_import
+set protocols bgp group WANGUARD neighbor IP-WANGUARD description IBGP_WANGUARD
+set protocols bgp group WANGUARD neighbor IP-WANGUARD local-address IP-ROTEADOR
+set protocols bgp group WANGUARD neighbor IP-WANGUARD import flowspec_import
+set protocols bgp group WANGUARD neighbor IP-WANGUARD family inet flow prefix-limit maximum 100
+set protocols bgp group WANGUARD neighbor IP-WANGUARD family inet flow no-validate flowspec_import
+set protocols bgp group WANGUARD neighbor IP-WANGUARD family inet flow legacy-redirect-ip-action receive
+set protocols bgp group WANGUARD neighbor IP-WANGUARD export deny-all
+set protocols bgp group WANGUARD neighbor IP-WANGUARD peer-as ASN-WANGUARD
+
+# *La no MX, confirmar as configs de netflow.*
+
+set forwarding-options sampling instance WANGUARD family inet output flow-inactive-timeout 15
+set forwarding-options sampling instance WANGUARD family inet output flow-active-timeout 60
+set forwarding-options sampling instance WANGUARD family inet output flow-server IP-WANGUARD port 2055
+set forwarding-options sampling instance WANGUARD family inet output flow-server IP-WANGUARD autonomous-system-type origin
+set forwarding-options sampling instance WANGUARD family inet output flow-server IP-WANGUARD version-ipfix template WANGUARD
+
+set forwarding-options sampling instance WANGUARD family inet6 output flow-inactive-timeout 15
+set forwarding-options sampling instance WANGUARD family inet6 output flow-active-timeout 60
+set forwarding-options sampling instance WANGUARD family inet6 output flow-server IP-WANGUARD port 2055
+set forwarding-options sampling instance WANGUARD family inet6 output flow-server IP-WANGUARD autonomous-system-type originset 
+set forwarding-options sampling instance WANGUARD family inet6 output flow-server IP-WANGUARD version-ipfix template WANGUARD-v6
+
+# *Recomendo adicionar export netflow somente nas interfaces UPLINK e Troca de Trafego - Ex transito IP, IXBR, CDN, PNI, IX Internacional*
