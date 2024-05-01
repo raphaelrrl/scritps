@@ -75,6 +75,7 @@ apt-get -y install apt-transport-https
 apt-get -y install wget
 apt-get -y install gnupg
 apt-get -y install python3-pysimplesoap
+apt-get -y install ntp unzip curl net-tools tcpdump
 
 # time-zone
 apt-get -y install ntpdate
