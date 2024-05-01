@@ -213,7 +213,7 @@ mysqladmin -u root password W4ngu4rd1!
     ) > /etc/motd
 
 # Criar login andrisoft
-    mysql -uroot -ptulipasql -e "CREATE DATABASE andrisoft;"
+    mysql -uroot -pW4ngu4rd1! -e "CREATE DATABASE andrisoft;"
 
     # Criar usuario andrisoft
     mysql -uroot -ptulipasql -e "CREATE USER IF NOT EXISTS 'andrisoft'@'localhost' identified by 'W4ngu4rd1!';"
@@ -456,21 +456,6 @@ y
 commit
 run save
 y
-
-# Mapa de roteadores de borda da rede
-#========================================================================
-
-
-IP              Nome         Conexao        Community     Porta NetStream
-10.25.255.4   = NE40v04    = IP-Oi        = NAOusePUBLICanimal == 2055
-10.25.255.7   = NE40v07    = IP-Embratel  = NAOusePUBLICanimal == 2056
-10.25.255.242 = f1a-vs-adm = PNIs         = NAOusePUBLICanimal == 2057
-10.25.255.13  = f1a-vs03   = IX-CGR       = NAOusePUBLICanimal == 2058
-10.25.255.15  = f1a-vs05   = IP-Telxe     = NAOusePUBLICanimal == 2059
-10.25.255.16  = f1a-vs06   = IX-SPO       = NAOusePUBLICanimal == 2060
-
-
-
 
 # Sincronizar data/hora via NTP (usar o proprio WanGuard como NTP Server)
 #========================================================================
