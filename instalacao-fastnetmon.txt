@@ -14,6 +14,18 @@ nano /etc/networks_list
 200.200.200.0/22
 2001:db8::/32
 
+# Criar o perfil de trafego:
+#prefixos
+CDN - 100.65.0.0/16
+SERVIÇOS DE TV 100.64.0.0/24
+CORPORATIVO IP FIXO. 100.66.0.0/16
+CGNAT. 100.64.1.0/24
+RESIDENCIAL IP FIXO. 100.64.2.0/24
+SERVIDORES diversos. 100.64.3.0/24
+SERVIDORES DNS. 100.64.4.0/24
+ASN LOCAL. 65001
+CLIENTES ASN 65002
+
 #acessar arquivo de configuração do fastnetmon aplicar ajuste. 
 nano /etc/fastnetmon.conf
 
