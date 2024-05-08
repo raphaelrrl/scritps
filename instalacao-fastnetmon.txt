@@ -34,7 +34,9 @@ threshold_flows = 3500
 # restart o serviço
 
 systemctl enable fastnetmon
-systemctl restart fastnetmon
+systemctl start fastnetmon
+systemctl status fastnetmon
+
 
 # verificar fluxo de rede
 fastnetmon_client
@@ -45,23 +47,19 @@ nano /etc/networks_whitelist
 200.200.200.0/30
 
 #habilitar Graficos
-nano /etc/fastnetmon.conf
+nano  /etc/fastnetmon.conf
 graphite = off/graphite = on/
 
 #habilitar influxdb
-#instalar as bibliotecas
+
+ rm /etc/apt/sources.list.d/influxdb.list
+ rm /etc/apt/trusted.gpg.d/influxdb.gpg
+
  apt install lsb-release gnupg2 curl wget
-#baixar a chave do repositorio
  wget -q https://repos.influxdata.com/influxdata-archive_compat.key
-#importar a chave
- echo '393e8779c89ac8d958f81f942f9ad7fb82a25e133faddaf92e15b16e6ac9ce4c influxdata-archive_compat.key' \
-  | sha256sum -c && cat influxdata-archive_compat.key \
-  | gpg --dearmor \
-  | tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
- #importar o repositorio
- echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main'\
-  | tee /etc/apt/sources.list.d/influxdata.list
- #atualizar e instalar 
+  echo '393e8779c89ac8d958f81f942f9ad7fb82a25e133faddaf92e15b16e6ac9ce4c influxdata-archive_compat.key' | sha256sum -c && cat influxdata-archive_compat.key | gpg --dearmor |  tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
+  echo 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main' |  tee /etc/apt/sources.list.d/influxdata.list
+
  apt update
  apt install influxdb
 
@@ -74,6 +72,8 @@ nano /etc/influxdb/influxdb.conf
   protocol = "tcp"
   consistency-level = "one"
   separator = "."
+  batch-size = 5000 # will flush if this many points get buffered
+  batch-timeout = "1s" # will flush at least this often even if we haven't hit buffer limit
   templates = [
     "fastnetmon.hosts.* app.measurement.cidr.direction.function.resource",
     "fastnetmon.networks.* app.measurement.cidr.direction.resource",
@@ -102,6 +102,374 @@ show measurements
 
 http://localhost:8086
 graphite
+
+
+
+root@fastnetmon:/tmp# cat /etc/fastnetmon.conf
+###
+### Principais parâmetros de configuração
+###
+
+### Configuração de registro
+
+# Nível de registro, pode ser informação ou depuração
+logging_level = info
+
+# habilite esta opção se quiser enviar logs para o recurso syslog local
+logging_local_syslog_logging = off
+
+# habilite esta opção se quiser enviar logs para um servidor syslog remoto via UDP
+logging_remote_syslog_logging = off
+
+# especifica um servidor e uma porta personalizados para registro remoto
+logging_remote_syslog_server = 10.10.10.10
+logging_remote_syslog_port = 514
+
+# Para melhorar o FastNetMon, precisamos saber como você o usa e qual é a sua plataforma de software e hardware.
+# Para conseguir isso, FastNetMon envia informações de uso a cada 1 hora para nosso servidor de estatísticas https://community-stats.fastnetmon.com
+# Mantemos altos padrões de proteção de dados e você pode encontrar nossa política de privacidade aqui: https://community-stats.fastnetmon.com
+# Você pode encontrar informações que estão sendo enviadas no GitHub: https://github.com/pavel-odintsov/fastnetmon/search?q=send_usage_data_to_reporting_server
+# Se você preferir desativar esse recurso, você precisa definir o seguinte sinalizador como ativado
+disable_usage_report = off
+
+# Ativa/desativa qualquer ação em caso de ataque
+enable_ban = on
+
+#Habilitar banimento para IPv6
+enable_ban_ipv6 = on
+
+# desabilita o processamento para determinada direção do tráfego
+process_incoming_traffic = on
+process_outgoing_traffic = on
+
+# dump todo o tráfego no arquivo de log
+dump_all_traffic = off
+
+# dump outro tráfego para registrar, útil para detectar prefixos perdidos
+dump_other_traffic = off
+
+# Quantos pacotes serão coletados do tráfego de ataque
+ban_details_records_count = 20
+
+# Quanto tempo (em segundos) devemos manter um IP em estado bloqueado
+# Se você definir 0 aqui, desabilita completamente a capacidade de cancelar o banimento
+ban_time = 1900
+
+# Verifique se o ataque ainda está ativo, antes de acionar um callback de cancelamento de banimento com esta opção
+# Se o ataque ainda estiver ativo, verifique cada execução do watchdog de unban
+unban_only_if_attack_finished = on
+
+# lista de todas as suas redes no formato CIDR
+networks_list_path = /etc/networks_list
+
+# lista redes em formato CIDR que não serão monitoradas quanto a ataques
+white_list_path = /etc/networks_whitelist
+
+# período de redesenho da tela do cliente
+check_period = 1
+
+# O rastreamento de conexão é muito útil para detecção de ataques porque fornece grandes quantidades de informações,
+# mas consome muito CPU e não é recomendado em grandes redes
+enable_connection_tracking = on
+
+# Diferentes abordagens para detecção de ataques
+ban_for_pps = on
+ban_for_bandwidth = on
+ban_for_flows = off
+
+# Limites para ataques Dos/DDoS
+threshold_pps = 20000
+threshold_mbps = 1000
+threshold_flows = 3500
+
+# Limites de ataque por protocolo
+# Não implementamos limites de fluxo por protocolo devido a limitações lógicas de cálculo de fluxo
+# Esses limites devem ser menores que os limites globais de pps/mbps
+
+threshold_tcp_mbps = 100000
+threshold_udp_mbps = 100000
+threshold_icmp_mbps = 100000
+
+threshold_tcp_pps = 100000
+threshold_udp_pps = 100000
+threshold_icmp_pps = 100000
+
+ban_for_tcp_bandwidth = off
+ban_for_udp_bandwidth = off
+ban_for_icmp_bandwidth = off
+
+ban_for_tcp_pps = off
+ban_for_udp_pps = off
+ban_for_icmp_pps = off
+
+###
+### Métodos de captura de tráfego
+###
+
+#
+# Opção padrão para captura de espelho de porta no Linux
+# Mecanismo de captura AF_PACKETe
+mirror_afpacket = off
+
+# Método de captura de tráfego baseado em XDP de alta eficiência
+# O XDP desconectará completamente a interface de rede do Linux e você poderá perder a conectividade se o tráfego de gerenciamento de rota for feito na mesma interface
+# Você precisa ter uma placa de rede separada para interface de gerenciamento
+mirror_afxdp = off
+
+# Ativa a lógica baseada em poll para verificar novos pacotes. Geralmente, elimina a pesquisa ativa e reduz a carga da CPU
+poll_mode_xdp = off
+
+# Coloca a interface no modo promisc automaticamente
+xdp_set_promisc = on
+
+# Habilita explicitamente o modo de cópia zero, requer suporte de driver
+zero_copy_xdp = off
+
+# Força o modo XDP nativo que requer suporte da placa de rede
+force_native_mode_xdp = off
+
+# Mude para usar o tamanho do IP como tamanho do pacote em vez dos dados do mecanismo de captura. Deve ser ativado quando o tráfego é cortado externamente
+xdp_read_packet_length_from_ip_header = off
+
+# Caminho para o programa de microcódigo XDP para processamento de pacotes
+microcode_xdp_path = /etc/xdp_kernel.o
+
+# Você pode usar esta opção para multiplicar todo o tráfego recebido por este valor
+# Pode ser útil para amostras de portas espelhadas
+mirror_af_packet_custom_sampling_rate = 1
+
+# AF_PACKET fanout mode mode, http://man7.org/linux/man-pages/man7/packet.7.html
+# Available modes: cpu, lb, hash, random, rollover, queue_mapping
+mirror_af_packet_fanout_mode = cpu
+
+# Esta opção deve ser habilitada se você estiver usando Juniper com espelhamento dos primeiros X bytes do pacote: máximo-packet-length 110;
+af_packet_read_packet_length_from_ip_header = off
+
+# Captura de tráfego Netmap, apenas para FreeBSD
+mirror_netmap = off
+
+# Taxa de amostragem de espelhamento baseada em Netmap
+netmap_sampling_ratio = 1
+
+# Esta opção deve ser habilitada se você estiver usando Juniper com espelhamento dos primeiros X bytes do pacote: máximo-packet-length 110;
+netmap_read_packet_length_from_ip_header = off
+
+# Modo Pcap, muito lento e não recomendado para uso em produção
+pcap = off
+
+# Método de captura Netflow com suporte v5, v9 e IPFIX
+netflow = off
+
+# Captura sFLOW adequada para switches
+sflow = off
+
+# Configuração para modos Netmap, mirror, pcap, AF_XDP
+# Para pcap poderíamos especificar "qualquer"
+# Para Netmap poderíamos especificar múltiplas interfaces separadas por vírgula
+interfaces = eth3,eth4
+
+# Usamos valores médios para velocidade de tráfego para determinado IP e calculamos a média nesse período (segundos)
+average_calculation_time = 5
+
+# Atraso entre tentativas de recálculo de tráfego
+speed_calculation_delay = 1
+
+#Configuração do Netflow
+
+# é possível especificar múltiplas portas aqui, usando vírgulas como delimitador
+netflow_port = 2055
+
+#
+# Host coletor Netflow para escutar.
+#
+# Para vincular todas as interfaces para uso IPv4 e IPv6 ::
+# Para vincular apenas em IPv4 use 0.0.0.0
+#
+# Para vincular localhost para IPv4 e IPv6 use ::1
+# Para vincular apenas em IPv4 use 127.0.0.1
+#
+netflow_host = 0.0.0.0
+
+# Os agentes Netflow v9 e IPFIX usam abordagens diferentes e muito complexas para notificar sobre a proporção da amostra
+# Aqui você pode especificar uma taxa de amostragem para todos esses agentes
+# Para NetFlow v5 extraímos a taxa de amostragem diretamente dos pacotes e esta opção não é usada
+netflow_sampling_ratio = 1
+
+#configuração do sFlow
+
+# É possível especificar múltiplas portas aqui, usando vírgulas como delimitador
+sflow_port = 6343
+# sflow_port = 6343,6344
+sflow_host = 0.0.0.0
+
+# Alguns fornecedores podem mentir sobre o comprimento total do pacote sFlow. Para evitar esse problema, podemos passar a usar o tamanho do cabeçalho do pacote IP  analisado
+sflow_read_packet_length_from_ip_header = off
+
+###
+### Ações quando ataque detectado
+###
+
+# Este script é executado para banimento, cancelamento de banimento e coleta de detalhes de ataque
+notify_script_path = /usr/local/bin/notify_about_attack.sh
+
+# coleta um dump completo do ataque com carga completa em formato compatível com pcap
+collect_attack_pcap_dumps = off
+
+# Salva detalhes do ataque no Redis cloud
+redis_enabled = off
+
+#Configuração do Redis cloud
+redis_port = 6379
+redis_host = 127.0.0.1
+
+# especifique um prefixo personalizado aqui
+redis_prefix = mydc1
+
+# Poderíamos armazenar informações de ataque no MongoDB
+mongodb_enabled = off
+mongodb_host = localhost
+mongodb_port = 27017
+mongodb_database_name = fastnetmon
+
+# Anuncie IPs bloqueados com protocolo BGP com ExaBGP
+exabgp = off
+exabgp_command_pipe = /var/run/exabgp.cmd
+exabgp_community = 65001:666
+
+# especifique múltiplas comunidades com esta sintaxe:
+# exabgp_community = [65001:666 65001:777]
+
+# especifica comunidades diferentes para anúncios de host e sub-rede
+# exabgp_community_subnet = 65001:667
+# exabgp_community_host = 65001:668
+
+exabgp_next_hop = 10.0.3.114
+
+# Em casos complexos você pode ter ambas as opções habilitadas e anunciar o host e a sub-rede simultaneamente
+
+# Anuncia o próprio host /32 com BGP
+exabgp_announce_host = on
+
+# Anuncia a sub-rede de origem do endereço IP em vez do próprio IP
+exabgp_announce_whole_subnet = off
+
+# Integração GoBGP
+gobgp = off
+
+# Configuração para anuncios ipv4
+gobgp_next_hop = 0.0.0.0
+gobgp_announce_host = on
+gobgp_announce_whole_subnet = off
+
+gobgp_community_host = 65001:666
+gobgp_community_subnet = 65001:777
+
+# Configuração para IPv6 anunciada
+gobgp_next_hop_ipv6 = 100::1
+gobgp_announce_host_ipv6 = on
+gobgp_announce_whole_subnet_ipv6 = off
+
+gobgp_community_host_ipv6 = 65001:666
+gobgp_community_subnet_ipv6 = 65001:777
+
+# Antes de usar o InfluxDB você precisa criar um banco de dados usando a ferramenta influx:
+#cria banco de dados fastnetmon
+
+# Integração InfluxDB
+# Mais detalhes podem ser encontrados aqui: https://fastnetmon.com/docs/influxdb_integration/
+influxdb = off
+influxdb_host = 127.0.0.1
+influxdb_port = 8086
+influxdb_database = fastnetmon
+
+# Autenticação InfluxDB
+influxdb_auth = off
+influxdb_user = fastnetmon
+influxdb_password = secure
+
+# Com que frequência exportamos métricas para o InfluxDB
+influxdb_push_period = 1
+
+# Monitoramento de grafite
+graphite = off
+# Por favor, use apenas IP porque nomes de domínio não são permitidos aqui
+graphite_host = 127.0.0.1
+graphite_port = 2003
+
+# Namespace padrão para dados Graphite
+graphite_prefix = fastnetmon
+
+# Com que frequência exportamos métricas para Graphite
+graphite_push_period = 1
+
+# Adicione endereços IP locais e aliases à lista de monitoramento
+#Funciona apenas para Linux
+monitor_local_ip_addresses = on
+
+# Adicione endereços IP para VEs OpenVZ/Virtuozzo à lista de monitoramento de rede
+monitor_openvz_vps_ip_addresses = off
+
+# Cria um grupo de hosts com limites fora do padrão
+# Você deve criar este grupo antes (no arquivo de configuração) de especificar quaisquer limites
+# grupo de hosts = meus_hosts:10.10.10.221/32,10.10.10.222/32
+# hostgroup = my_hosts:10.10.10.221/32,10.10.10.222/32
+
+#Configurar este grupo
+my_hosts_enable_ban = off
+
+my_hosts_ban_for_pps = off
+my_hosts_ban_for_bandwidth = off
+my_hosts_ban_for_flows = off
+
+my_hosts_threshold_pps = 100000
+my_hosts_threshold_mbps = 1000
+my_hosts_threshold_flows = 3500
+
+# Caminho para o arquivo pid para verificar "se outra cópia da ferramenta está sendo executada", é útil quando você executa múltiplas instâncias da ferramenta
+pid_path = /var/run/fastnetmon.pid
+
+# Caminho para o arquivo onde armazenamos informações de tráfego IPv4 para fastnetmon_client
+cli_stats_file_path = /tmp/fastnetmon.dat
+
+# Caminho para o arquivo onde armazenamos informações de tráfego IPv6 para fastnetmon_client
+cli_stats_ipv6_file_path = /tmp/fastnetmon_ipv6.dat
+
+# Habilite a API gRPC (necessário para a ferramenta fastnetmon_api_client)
+enable_api = on
+
+# Permite exportação de tráfego para Kafka
+kafka_traffic_export = off
+
+# Nome do tópico de exportação de tráfego Kafka
+kafka_traffic_export_topic = fastnetmon
+
+# Formato de exportação de tráfego Kafka: json ou protobuf
+kafka_traffic_export_format = json
+
+# Lista de exportação de tráfego Kafka de corretores separados por vírgula
+kafka_traffic_export_brokers = 10.154.0.1:9092,10.154.0.2:9092
+
+# Endpoint de monitoramento do Prometheus
+prometheus = on
+
+# Prometheus port
+prometheus_port = 9209
+
+# Prometheus host
+prometheus_host = 127.0.0.1
+
+###
+### Configuração do cliente
+###
+
+# Campo utilizado para classificação no cliente, os valores válidos são: pacotes, bytes ou fluxos
+sort_parameter = packets
+
+# Quantos IPs serão listados para fluxos da rede de download e upload
+max_ips_in_list = 7
+root@fastnetmon:/tmp#
+
+
 
 
 #BLACK-HOLE FRR/HUAWEI
@@ -144,6 +512,7 @@ ip community-filter basic FASTNETMON-BH index 10 permit 65001:666
 route-policy FASTNETMON-IN deny node 10
 if-match ip-prefix IGNORE-FASTNETMON
 
+ip route-static 192.0.2.1 255.255.255.255 NULL0 description BH
 route-policy FASTNETMON-IN permit node 20
 if-match ip-prefix ACCEPT-FASTNETMON
 if-match community-filter FASTNETMON-BH 
@@ -195,3 +564,100 @@ iface eno1 inet static
         }
 }
 systemctl start nftables
+
+
+ip prefix-list FASTNETMON-ADDRESS seq 5 permit 45.163.148.0/22 le 32
+!
+route-map FASTNETMON-IN deny 10
+!
+route-map FASTNETMON-OUT permit 10
+ match ip address prefix-list FASTNETMON-ADDRESS
+ set community 65001:666
+!
+router bgp 65001
+ bgp router-id 10.100.0.2
+ neighbor 10.100.0.1 remote-as 260072
+ neighbor 10.100.0.1 description "Huawei"
+ !
+ address-family ipv4 unicast
+  neighbor 10.100.0.1 route-map MARK_FASTNETMON_IMPORT in
+  neighbor 10.100.0.1 route-map MARK_FASTNETMON_EXPORT out
+ exit-address-family
+!
+end
+write memory
+
+community 666:666 MIGO
+community 900:666 WEBBY
+
+
+ip route-static 192.0.2.1 255.255.255.255 NULL0 description BH
+
+ip ip-prefix  ACCEPT-FASTNETMON index 10 permit 0.0.0.0 0 greater-equal 32
+ip ip-prefix  IGNORE-FASTNETMON index 10 permit 45.163.148.136 30 greater-equal 28 less-equal 32
+
+ip community-filter basic FASTNETMON-BH index 10 permit 65001:666
+
+route-policy FASTNETMON-IN deny node 10
+if-match ip-prefix IGNORE-FASTNETMON
+
+route-policy FASTNETMON-IN permit node 20
+if-match community-filter FASTNETMON-BH 
+apply local-preference 999
+apply ip-address next-hop 192.0.2.1
+apply community 666:666 900:666
+if-match ip-prefix ACCEPT-FASTNETMON
+
+route-policy FASTNETMON-IN deny node 100
+
+route-policy FASTNETMON-OUT deny node 100
+
+ip community-filter basic BLACKHOLE index 10 permit 65006:666
+
+
+route-policy AS263152-MIGO-OUT permit node 20
+if-match community-filter BLACKHOLE
+apply community 666:666
+
+route-policy AS262493-WEBBY-OUT permit node 20
+if-match community-filter BLACKHOLE
+apply community 900:666
+
+
+
+---- desfazendo graphite
+
+# sed -i 's/graphite = on/graphite = off/' /etc/fastnetmon.conf
+# vim /etc/influxdb/influxdb.conf
+Comente:
+[[graphite]]
+#  enabled = true
+#  bind-address = ":2003"
+#  protocol = "tcp"
+#  consistency-level = "one"
+#  separator = "."
+#  templates = [
+#    "fastnetmon.hosts.* app.measurement.cidr.direction.function.resource",
+#    "fastnetmon.networks.* app.measurement.cidr.direction.resource",
+#    "fastnetmon.total.* app.measurement.direction.resource"
+#  ]
+
+# systemctl restart influxdb fastnetmon
+
+
+Ative o influxdb
+# sed -i 's/influxdb = off/influxdb = on/' /etc/fastnetmon.conf
+
+  # InfluxDB integration
+  influxdb = on
+  influxdb_host = 127.0.0.1
+  influxdb_port = 8086
+  influxdb_database = fastnetmon
+
+# influx
+> DROP DATABASE graphite
+> CREATE DATABASE fastnetmon
+> SHOW DATABASES
+> EXIT
+
+
