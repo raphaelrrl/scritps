@@ -1,7 +1,7 @@
 #!/bin/sh
 #fastnetmon-adv
 # instalação dependencias
-apt install wget tcpdump net-tools zip curl -y
+apt install wget tcpdump net-tools zip curl gpg -y
 
 # instalação fastnetmon adv
 wget https://install.fastnetmon.com/installer -Oinstaller
