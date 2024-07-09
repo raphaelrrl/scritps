@@ -6,11 +6,13 @@ useradd zabbix
 nano /etc/hostname
 echo  zabbix-bd > /proc/sys/kernel/hostname
 
+
 # dependencias
 apt install -y wget build-essential
 apt install -y mariadb-server mariadb-client 
 
 #segurança
+mysqladmin -u root password p455w0rd
 mysql_secure_installation
 change the root password? [y/n] n (não)
 remove anonymous users? [y/n] y (sim)
@@ -30,15 +32,15 @@ quit;
 ##bem, chegou a hora de baixar o nosso zabbix.
 
 cd /tmp
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb
-dpkg -i zabbix-release_6.0-5+debian12_all.deb
+wget https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_7.0-2+debian12_all.deb
+dpkg -i zabbix-release_7.0-2+debian12_all.deb
 apt update
 apt upgrade
-apt install -y zabbix-server-mysql zabbix-sql-scripts  zabbix-agent
+apt install -y zabbix-server-mysql zabbix-sql-scripts zabbix-agent
 
 ##importando base de dados do zabbix
 
-zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -pp455w0rd zabbix
+zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix
 
 ## Liberar conexão no bando de dados
 
