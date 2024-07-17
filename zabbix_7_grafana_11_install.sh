@@ -1,7 +1,7 @@
 #!/bin/bash
 #Autor: Raphael Rodrigues
 #Homologado para Debian 12 LTS
-#Baixe o script, execute o comando chmod +x zabbix_6_grafana_10_install.sh para permissão de execução.
+#Baixe o script, execute o comando chmod +x zabbix_7_grafana_11_install.sh para permissão de execução.
 #Em seguida execute o comando ./zabbix_7_grafana_11_install.sh
 
 # Upgrade do SO
@@ -52,7 +52,6 @@ apt-get install -y apt-transport-https
 apt-get install -y software-properties-common
 wget -q -O - https://packages.grafana.com/gpg.key | apt-key add -
 sleep 10
-#echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list
 mkdir -p /etc/apt/keyrings/
 wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg > /dev/null
 echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee -a /etc/apt/sources.list.d/grafana.list
