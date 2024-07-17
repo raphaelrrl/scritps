@@ -2,7 +2,7 @@
 #Autor: Raphael Rodrigues
 #Homologado para Debian 12 LTS
 #Baixe o script, execute o comando chmod +x zabbix_6_grafana_10_install.sh para permissão de execução.
-#Em seguida execute o comando ./zabbix_6_grafana_10_install.sh
+#Em seguida execute o comando ./zabbix_7_grafana_11_install.sh
 
 # Upgrade do SO
 apt update
@@ -23,8 +23,8 @@ useradd zabbix
 
 ##bem, chegou a hora de baixar o nosso zabbix.
 cd /tmp
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-5+debian12_all.deb
-dpkg -i zabbix-release_6.0-5+debian12_all.deb
+wget https://repo.zabbix.com/zabbix/7.0/debian/pool/main/z/zabbix-release/zabbix-release_7.0-2+debian12_all.deb
+dpkg -i zabbix-release_7.0-2+debian12_all.deb
 sleep 3
 apt update -y ; apt upgrade -y
 apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
@@ -52,7 +52,10 @@ apt-get install -y apt-transport-https
 apt-get install -y software-properties-common
 wget -q -O - https://packages.grafana.com/gpg.key | apt-key add -
 sleep 10
-echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list
+#echo "deb https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list
+mkdir -p /etc/apt/keyrings/
+wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /etc/apt/keyrings/grafana.gpg > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee -a /etc/apt/sources.list.d/grafana.list
 apt-get update
 apt-get install -y grafana
 
