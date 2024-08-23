@@ -1,6 +1,5 @@
 ### Para integrar Andrisoft Wanguard Anti-DDoS com Grafana, você pode seguir estes passos principais: 
 ### utilizar a API do Wanguard para coletar dados, armazená-los em um banco de dados (como MySQL), e configurar o Grafana para visualizar esses dados. 
-### Vou desenvolver um exemplo de script Python que faz essa integração.
 
 ### Passo 1: Configurar o Banco de Dados
 
