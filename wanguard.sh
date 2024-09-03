@@ -172,7 +172,7 @@ mysqladmin -u root password W4ngu4rd1
         echo
         echo '[embedded]'
         echo '[mariadb]'
-        echo '[mariadb-10.5]'
+        echo '[mariadb-10.11]'
         echo
     ) > /etc/mysql/mariadb.conf.d/50-server.cnf
 
