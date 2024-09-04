@@ -1,6 +1,6 @@
 #!/bin/bash
 #backup frontend,alert scripts, external scripts e databases mysql zabbix
-
+# para importar o dump do banco de dado, executar este comando mysqldump -u username -p database_name > data-dump.sql
 #set variaveis
 user="zabbix"
 password="password"
