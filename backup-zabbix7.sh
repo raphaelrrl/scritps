@@ -42,10 +42,10 @@ cp -R /usr/lib/zabbix/externalscripts/* $backup_path/backup-$date/externalscript
 cp -R /etc/zabbix/* $backup_path/backup-$date/fileconf
 
 # File Cofiguration my.cnf
-cp -R /etc/my.cnf $backup_path/backup-$date/fileconf/mysql
+cp -R /etc/mysql/mariadb.conf.d/50-server.cnf $backup_path/backup-$date/fileconf/mysql
 
 # File Cofiguration my.cnf
-cp -R /etc/my.cnf.d/* $backup_path/backup-$date/fileconf/mysql
+cp -R /etc/mysql/* $backup_path/backup-$date/fileconf/mysql
 
 # Add File to .tar
 tar -cvf $backup_path/backup-$date.tar
