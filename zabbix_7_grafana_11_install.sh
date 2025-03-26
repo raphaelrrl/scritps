@@ -1,7 +1,7 @@
 #!/bin/bash
 #Autor: Raphael Rodrigues
 #Homologado para Debian 12 LTS
-#Baixe o script - wget 
+#Baixe o script - wget https://raw.githubusercontent.com/raphaelrrl/scritps/refs/heads/main/zabbix_7_grafana_11_install.sh
 #Execute o comando-  chmod +x zabbix_7_grafana_11_install.sh - para permissão de execução.
 #Execute o comando-  chmod 777 zabbix_7_grafana_11_install.sh - para permissão de total ao script.
 #Em seguida execute o comando-  ./zabbix_7_grafana_11_install.sh
