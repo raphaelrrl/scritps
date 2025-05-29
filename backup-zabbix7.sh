@@ -39,6 +39,8 @@ mkdir $backup_path/backup-$date/externalscripts
 mkdir $backup_path/backup-$date/database
 mkdir $backup_path/backup-$date/fileconf
 mkdir $backup_path/backup-$date/fileconf/mysql
+mkdir $backup_path/backup-$date/fileconf/mysql/conf.d
+mkdir $backup_path/backup-$date/fileconf/mysql/mariadb.conf.d
 
 # Dump database into SQL file
 mysqldump --user=$user --password=$password --host=$host $db_name --single-transaction --skip-lock-tables > $backup_path/backup-$date/database/$db_name-$date.sql.bkp
